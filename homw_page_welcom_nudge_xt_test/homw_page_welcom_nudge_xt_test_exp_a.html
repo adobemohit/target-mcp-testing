@@ -1,298 +1,193 @@
 <style data-atgit-offer="css">
-/* Offer styles — centered welcome popup, full-viewport overlay */
-[data-atgit-offer-host] {
-  box-sizing: border-box;
+[data-atgit-offer-host="welcome-nudge"] {
   position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  min-width: 100vw;
-  min-height: 100vh;
-  min-height: 100dvh;
-  z-index: 99999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0;
-  padding: 24px;
-  font-family: "Open Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  animation: atgit-popup-backdrop-in 0.35s ease both;
-}
-
-[data-atgit-offer-host] *,
-[data-atgit-offer-host] *::before,
-[data-atgit-offer-host] *::after {
-  box-sizing: border-box;
-}
-
-[data-atgit-offer-host] .atgit-popup-backdrop {
-  position: absolute;
-  top: 0;
-  right: 0;
   bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 20, 60, 0.55);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  border: none;
-  padding: 0;
-  margin: 0;
-  cursor: pointer;
+  z-index: 2147483000;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  pointer-events: none;
 }
 
-[data-atgit-offer-host] .atgit-popup-card {
+[data-atgit-offer-host="welcome-nudge"] .atgit-nudge {
+  pointer-events: auto;
   position: relative;
-  z-index: 1;
-  width: min(420px, calc(100vw - 32px));
-  max-width: 100%;
-  margin: auto;
-  padding: 36px 32px 28px;
-  border-radius: 20px;
-  background: linear-gradient(165deg, #ffffff 0%, #f0f5ff 55%, #e8effc 100%);
-  color: #001e5c;
-  box-shadow:
-    0 24px 64px rgba(0, 30, 92, 0.28),
-    0 4px 16px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(0, 61, 165, 0.12);
-  overflow: hidden;
-  text-align: center;
-  animation: atgit-popup-card-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin: 0 0 20px 20px;
+  max-width: min(380px, calc(100vw - 40px));
+  padding: 18px 44px 18px 18px;
+  background: linear-gradient(145deg, #0b1f4d 0%, #163a7a 55%, #1a4a96 100%);
+  color: #ffffff;
+  border-radius: 12px 12px 12px 4px;
+  box-shadow: 0 12px 32px rgba(11, 31, 77, 0.35);
+  transform: translateX(-120%);
+  opacity: 0;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
 }
 
-[data-atgit-offer-host] .atgit-popup-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 5px;
-  background: linear-gradient(90deg, #003da5 0%, #2e6de0 50%, #003da5 100%);
-  pointer-events: none;
+[data-atgit-offer-host="welcome-nudge"] .atgit-nudge.is-open {
+  transform: translateX(0);
+  opacity: 1;
 }
 
-[data-atgit-offer-host] .atgit-popup-card::after {
-  content: "";
-  position: absolute;
-  bottom: -48px;
-  right: -48px;
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  background: rgba(0, 61, 165, 0.06);
-  pointer-events: none;
-}
-
-[data-atgit-offer-host] .atgit-popup-icon {
+[data-atgit-offer-host="welcome-nudge"] .atgit-nudge__thumb {
+  flex: 0 0 64px;
   width: 64px;
   height: 64px;
-  margin: 0 auto 18px;
-  border-radius: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 30px;
-  line-height: 1;
-  background: linear-gradient(145deg, #003da5 0%, #001e5c 100%);
-  color: #ffffff;
-  box-shadow: 0 8px 20px rgba(0, 61, 165, 0.28);
-}
-
-[data-atgit-offer-host] .atgit-popup-title {
+  border-radius: 8px;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.15);
   display: block;
-  margin: 0 0 10px;
-  font-family: var(--font-family-bauhuas-std-medium), "Open Sans", sans-serif;
-  font-size: 22px;
-  font-weight: 700;
-  line-height: 1.3;
-  letter-spacing: 0.01em;
-  color: #001e5c;
 }
 
-[data-atgit-offer-host] .atgit-popup-message {
+[data-atgit-offer-host="welcome-nudge"] .atgit-nudge__body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+[data-atgit-offer-host="welcome-nudge"] .atgit-nudge__eyebrow {
   display: block;
-  margin: 0 0 24px;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.55;
-  color: rgba(0, 30, 92, 0.78);
-}
-
-[data-atgit-offer-host] .atgit-popup-cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 160px;
-  padding: 12px 28px;
-  border: none;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #003da5 0%, #001e5c 100%);
-  color: #ffffff;
-  font-family: inherit;
-  font-size: 14px;
+  margin: 0 0 6px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.02em;
-  cursor: pointer;
-  box-shadow: 0 6px 16px rgba(0, 61, 165, 0.3);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9ec5ff;
 }
 
-[data-atgit-offer-host] .atgit-popup-cta:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 22px rgba(0, 61, 165, 0.36);
+[data-atgit-offer-host="welcome-nudge"] .atgit-nudge__title {
+  margin: 0 0 8px;
+  font-family: var(--font-family-bauhuas-std-medium);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #ffffff;
 }
 
-[data-atgit-offer-host] .atgit-popup-cta:focus-visible {
-  outline: 2px solid #003da5;
-  outline-offset: 3px;
+[data-atgit-offer-host="welcome-nudge"] .atgit-nudge__message {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.9);
 }
 
-[data-atgit-offer-host] .atgit-popup-close {
+[data-atgit-offer-host="welcome-nudge"] .atgit-nudge__close {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 32px;
-  height: 32px;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
   padding: 0;
-  border: none;
-  border-radius: 10px;
-  background: rgba(0, 61, 165, 0.08);
-  color: #001e5c;
-  font-size: 20px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-size: 18px;
   line-height: 1;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s ease;
 }
 
-[data-atgit-offer-host] .atgit-popup-close:hover {
-  background: rgba(0, 61, 165, 0.16);
-}
-
-[data-atgit-offer-host] .atgit-popup-close:focus-visible {
-  outline: 2px solid #003da5;
-  outline-offset: 2px;
-}
-
-@keyframes atgit-popup-backdrop-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes atgit-popup-card-in {
-  from {
-    opacity: 0;
-    transform: translateY(18px) scale(0.94);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+[data-atgit-offer-host="welcome-nudge"] .atgit-nudge__close:hover,
+[data-atgit-offer-host="welcome-nudge"] .atgit-nudge__close:focus {
+  background: rgba(255, 255, 255, 0.22);
+  outline: none;
 }
 
 @media (max-width: 480px) {
-  [data-atgit-offer-host] {
-    padding: 16px;
+  [data-atgit-offer-host="welcome-nudge"] .atgit-nudge {
+    margin: 0 0 12px 12px;
+    max-width: calc(100vw - 24px);
   }
 
-  [data-atgit-offer-host] .atgit-popup-card {
-    padding: 32px 22px 24px;
-  }
-
-  [data-atgit-offer-host] .atgit-popup-title {
-    font-size: 20px;
-  }
-
-  [data-atgit-offer-host] .atgit-popup-message {
-    font-size: 13px;
+  [data-atgit-offer-host="welcome-nudge"] .atgit-nudge__thumb {
+    flex-basis: 56px;
+    width: 56px;
+    height: 56px;
   }
 }
 </style>
 
 <script data-atgit-offer="js">
-// Offer script — centered welcome popup, full-window overlay (DOM only).
 (function () {
-  var existing = document.querySelectorAll("[data-atgit-offer-host]");
-  for (var i = 0; i < existing.length; i++) {
-    existing[i].remove();
-  }
+  var HOST_ATTR = "data-atgit-offer-host";
+  var HOST_VALUE = "welcome-nudge";
+
+  document.querySelectorAll("[" + HOST_ATTR + "=\"" + HOST_VALUE + "\"]").forEach(function (node) {
+    node.parentNode && node.parentNode.removeChild(node);
+  });
+
+  var body = document.body;
+  if (!body) return;
 
   var host = document.createElement("div");
-  host.setAttribute("data-atgit-offer-host", "1");
-  host.setAttribute("role", "dialog");
-  host.setAttribute("aria-modal", "true");
-  host.setAttribute("aria-label", "Welcome message");
-  host.style.cssText =
-    "position:fixed;top:0;right:0;bottom:0;left:0;width:100%;height:100%;" +
-    "min-width:100vw;min-height:100vh;z-index:99999;display:flex;" +
-    "align-items:center;justify-content:center;margin:0;padding:24px;";
+  host.setAttribute(HOST_ATTR, HOST_VALUE);
 
-  var backdrop = document.createElement("button");
-  backdrop.className = "atgit-popup-backdrop";
-  backdrop.setAttribute("type", "button");
-  backdrop.setAttribute("aria-label", "Dismiss welcome message");
-  backdrop.style.cssText =
-    "position:absolute;top:0;right:0;bottom:0;left:0;width:100%;height:100%;";
-
-  var card = document.createElement("div");
-  card.className = "atgit-popup-card";
+  var panel = document.createElement("aside");
+  panel.className = "atgit-nudge";
+  panel.setAttribute("role", "dialog");
+  panel.setAttribute("aria-label", "Welcome message");
 
   var closeBtn = document.createElement("button");
-  closeBtn.className = "atgit-popup-close";
-  closeBtn.setAttribute("type", "button");
-  closeBtn.setAttribute("aria-label", "Dismiss welcome message");
+  closeBtn.type = "button";
+  closeBtn.className = "atgit-nudge__close";
+  closeBtn.setAttribute("aria-label", "Close welcome message");
   closeBtn.textContent = "\u00d7";
 
-  var iconWrap = document.createElement("div");
-  iconWrap.className = "atgit-popup-icon";
-  iconWrap.setAttribute("aria-hidden", "true");
-  iconWrap.textContent = "\u2708";
+  var thumb = document.createElement("img");
+  thumb.className = "atgit-nudge__thumb";
+  thumb.alt = "";
+  thumb.width = 64;
+  thumb.height = 64;
+  thumb.src =
+    "data:image/svg+xml," +
+    encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">' +
+        '<rect width="64" height="64" rx="8" fill="#2a5fad"/>' +
+        '<circle cx="32" cy="24" r="10" fill="#9ec5ff"/>' +
+        '<path d="M12 52c4-12 16-18 20-18s16 6 20 18" fill="#9ec5ff"/>' +
+      "</svg>"
+    );
 
-  var title = document.createElement("strong");
-  title.className = "atgit-popup-title";
+  var content = document.createElement("div");
+  content.className = "atgit-nudge__body";
+
+  var eyebrow = document.createElement("span");
+  eyebrow.className = "atgit-nudge__eyebrow";
+  eyebrow.textContent = "IndiGo";
+
+  var title = document.createElement("p");
+  title.className = "atgit-nudge__title";
   title.textContent = "Welcome aboard!";
 
   var message = document.createElement("p");
-  message.className = "atgit-popup-message";
+  message.className = "atgit-nudge__message";
   message.textContent =
-    "Hi there! Plan your journey with ease \u2014 flights, hotels and beyond.";
-
-  var cta = document.createElement("button");
-  cta.className = "atgit-popup-cta";
-  cta.setAttribute("type", "button");
-  cta.textContent = "Start exploring";
+    "Glad you are here. Explore low fares and plan your next trip with us.";
 
   function dismiss() {
-    host.remove();
+    panel.classList.remove("is-open");
+    window.setTimeout(function () {
+      if (host.parentNode) host.parentNode.removeChild(host);
+    }, 450);
   }
 
-  backdrop.addEventListener("click", dismiss);
   closeBtn.addEventListener("click", dismiss);
-  cta.addEventListener("click", dismiss);
 
-  card.appendChild(closeBtn);
-  card.appendChild(iconWrap);
-  card.appendChild(title);
-  card.appendChild(message);
-  card.appendChild(cta);
+  content.appendChild(eyebrow);
+  content.appendChild(title);
+  content.appendChild(message);
 
-  host.appendChild(backdrop);
-  host.appendChild(card);
+  panel.appendChild(closeBtn);
+  panel.appendChild(thumb);
+  panel.appendChild(content);
+  host.appendChild(panel);
+  body.appendChild(host);
 
-  var mountTarget = document.body;
-  if (mountTarget) {
-    mountTarget.appendChild(host);
-  }
+  window.requestAnimationFrame(function () {
+    window.requestAnimationFrame(function () {
+      panel.classList.add("is-open");
+    });
+  });
 })();
 </script>
