@@ -50,12 +50,13 @@
   padding: 48px;
   flex-direction: column;
   justify-content: center;
+  font-family: inherit;
 }
 
 [data-atgit-offer-host] .atgit-banner-title {
   margin: 0 0 12px;
   color: inherit;
-  font: inherit;
+  font-family: var(--font-family-bauhuas-std-medium);
   font-size: clamp(28px, 4vw, 48px);
   font-weight: 700;
   line-height: 1.12;
@@ -64,7 +65,7 @@
 [data-atgit-offer-host] .atgit-banner-copy {
   margin: 0;
   color: inherit;
-  font: inherit;
+  font-family: inherit;
   font-size: clamp(16px, 2vw, 20px);
   line-height: 1.5;
 }
@@ -125,6 +126,7 @@
     document.body;
 
   if (target) {
+    host.style.fontFamily = window.getComputedStyle(target).fontFamily;
     target.insertBefore(host, target.firstChild);
   }
 })();
