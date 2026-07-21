@@ -1,0 +1,192 @@
+<style data-atgit-offer="css">
+/* Offer styles — applied on the live page */
+[data-atgit-offer-host] {
+  box-sizing: border-box;
+  position: fixed;
+  left: 24px;
+  bottom: 24px;
+  z-index: 99999;
+  width: min(360px, calc(100vw - 32px));
+  font-family: "Open Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  animation: atgit-nudge-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes atgit-nudge-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+[data-atgit-offer-host] .atgit-nudge-card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 44px 18px 18px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #003da5 0%, #001e5c 100%);
+  color: #ffffff;
+  box-shadow:
+    0 12px 32px rgba(0, 30, 92, 0.28),
+    0 2px 8px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+}
+
+[data-atgit-offer-host] .atgit-nudge-card::before {
+  content: "";
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+
+[data-atgit-offer-host] .atgit-nudge-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  line-height: 1;
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+[data-atgit-offer-host] .atgit-nudge-content {
+  flex: 1;
+  min-width: 0;
+}
+
+[data-atgit-offer-host] .atgit-nudge-title {
+  display: block;
+  margin: 0 0 6px;
+  font-family: var(--font-family-bauhuas-std-medium);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+
+[data-atgit-offer-host] .atgit-nudge-message {
+  display: block;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+[data-atgit-offer-host] .atgit-nudge-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+[data-atgit-offer-host] .atgit-nudge-close:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+[data-atgit-offer-host] .atgit-nudge-close:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  [data-atgit-offer-host] {
+    left: 16px;
+    bottom: 16px;
+  }
+
+  [data-atgit-offer-host] .atgit-nudge-card {
+    padding: 16px 40px 16px 16px;
+  }
+
+  [data-atgit-offer-host] .atgit-nudge-title {
+    font-size: 15px;
+  }
+}
+</style>
+
+<script data-atgit-offer="js">
+// Offer script — DOM manipulation only (no HTML authoring).
+(function () {
+  var existing = document.querySelectorAll("[data-atgit-offer-host]");
+  for (var i = 0; i < existing.length; i++) {
+    existing[i].remove();
+  }
+
+  var host = document.createElement("div");
+  host.setAttribute("data-atgit-offer-host", "1");
+  host.setAttribute("role", "complementary");
+  host.setAttribute("aria-label", "Welcome message");
+
+  var card = document.createElement("div");
+  card.className = "atgit-nudge-card";
+
+  var iconWrap = document.createElement("div");
+  iconWrap.className = "atgit-nudge-icon";
+  iconWrap.setAttribute("aria-hidden", "true");
+  iconWrap.textContent = "\u2708";
+
+  var content = document.createElement("div");
+  content.className = "atgit-nudge-content";
+
+  var title = document.createElement("strong");
+  title.className = "atgit-nudge-title";
+  title.textContent = "Welcome aboard!";
+
+  var message = document.createElement("p");
+  message.className = "atgit-nudge-message";
+  message.textContent =
+    "Hi there! Plan your journey with ease \u2014 flights, hotels and beyond.";
+
+  var closeBtn = document.createElement("button");
+  closeBtn.className = "atgit-nudge-close";
+  closeBtn.setAttribute("type", "button");
+  closeBtn.setAttribute("aria-label", "Dismiss welcome message");
+  closeBtn.textContent = "\u00d7";
+
+  closeBtn.addEventListener("click", function () {
+    host.remove();
+  });
+
+  content.appendChild(title);
+  content.appendChild(message);
+  card.appendChild(iconWrap);
+  card.appendChild(content);
+  card.appendChild(closeBtn);
+  host.appendChild(card);
+
+  var mountTarget = document.body;
+  if (mountTarget) {
+    mountTarget.appendChild(host);
+  }
+})();
+</script>
