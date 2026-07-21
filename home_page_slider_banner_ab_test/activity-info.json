@@ -16,6 +16,7 @@
       "offer_name": "Experience A - Home Page slider banner",
       "offer_id": null,
       "experience_name": "Experience A - Home Page slider banner",
+      "traffic_percent": 0,
       "mode": "create_or_update"
     },
     {
@@ -24,6 +25,7 @@
       "offer_name": "Home Page slider banner - Variant B",
       "offer_id": null,
       "experience_name": "Home Page slider banner - Variant B",
+      "traffic_percent": 0,
       "mode": "create_or_update"
     }
   ],

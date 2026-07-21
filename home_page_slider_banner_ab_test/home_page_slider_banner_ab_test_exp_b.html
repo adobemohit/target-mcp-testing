@@ -1,36 +1,423 @@
 <style data-atgit-offer="css">
-/* Offer styles — applied on the live page */
-[data-atgit-offer-host] {
+/* Incomplete-booking nudge — inherits the page's font family. */
+[data-atgit-offer-host],
+[data-atgit-offer-host] * {
   box-sizing: border-box;
+}
+
+[data-atgit-offer-host] {
+  --atgit-ink: #20205c;
+  --atgit-ink-soft: rgba(32, 32, 92, 0.72);
+  --atgit-line: rgba(32, 32, 92, 0.12);
+  --atgit-sky: #3d8bfd;
+  --atgit-surface: linear-gradient(145deg, #ffffff 0%, #f4f7ff 55%, #eef3ff 100%);
+
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 2147483000;
+  display: grid;
+  width: min(372px, calc(100vw - 28px));
+  grid-template-columns: auto 1fr;
+  gap: 0 16px;
+  padding: 22px 48px 22px 24px;
+  overflow: hidden;
+  color: var(--atgit-ink);
+  background: var(--atgit-surface);
+  border: 1px solid var(--atgit-line);
+  border-radius: 16px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.7) inset,
+    0 18px 40px rgba(24, 24, 55, 0.18);
+  font-family: inherit;
+  line-height: 1.35;
+  animation: atgit-nudge-enter 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+[data-atgit-offer-host]::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 4px;
+  content: "";
+  background: linear-gradient(180deg, var(--atgit-ink) 0%, var(--atgit-sky) 100%);
+}
+
+.atgit-plane-wrap {
+  position: relative;
+  display: grid;
+  flex: 0 0 46px;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  color: #fff;
+  background: radial-gradient(circle at 30% 28%, #3a3a8a 0%, var(--atgit-ink) 70%);
+  border-radius: 14px;
+  align-self: start;
+  animation: atgit-plane-float 2.8s ease-in-out 600ms infinite;
+}
+
+.atgit-plane-wrap::after {
+  position: absolute;
+  inset: -6px;
+  content: "";
+  border: 1.5px solid rgba(61, 139, 253, 0.35);
+  border-radius: 18px;
+  animation: atgit-plane-ring 2.8s ease-out 600ms infinite;
+}
+
+.atgit-plane-icon {
+  width: 24px;
+  height: 24px;
+  overflow: visible;
+  fill: currentColor;
+  transform: translate(1px, -1px) rotate(-28deg);
+}
+
+.atgit-nudge-copy {
+  min-width: 0;
+  padding-top: 1px;
+}
+
+.atgit-nudge-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 6px;
+  color: var(--atgit-ink-soft);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.atgit-nudge-eyebrow::before {
+  display: block;
+  width: 6px;
+  height: 6px;
+  content: "";
+  background: var(--atgit-sky);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(61, 139, 253, 0.18);
+  animation: atgit-dot-pulse 1.8s ease-in-out infinite;
+}
+
+.atgit-nudge-title {
+  display: block;
+  margin: 0;
+  color: var(--atgit-ink);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.atgit-nudge-route {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 0;
+  color: var(--atgit-ink);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.atgit-nudge-route span {
+  opacity: 0.85;
+}
+
+.atgit-nudge-route-line {
+  position: relative;
+  flex: 1 1 auto;
+  height: 1px;
+  min-width: 28px;
+  background: linear-gradient(
+    90deg,
+    rgba(32, 32, 92, 0.15),
+    rgba(61, 139, 253, 0.55),
+    rgba(32, 32, 92, 0.15)
+  );
+}
+
+.atgit-nudge-route-line::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  content: "";
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 6px solid var(--atgit-sky);
+  transform: translate(-20%, -50%);
+}
+
+.atgit-nudge-message {
+  display: block;
+  margin: 8px 0 14px;
+  color: var(--atgit-ink-soft);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.atgit-nudge-cta {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  color: #fff;
+  background: var(--atgit-ink);
+  border: 1px solid var(--atgit-ink);
+  border-radius: 10px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  transition: background 160ms ease, transform 160ms ease, border-color 160ms ease;
+}
+
+.atgit-nudge-cta::after {
+  display: inline-block;
+  content: "\2192";
+  font-weight: 700;
+  transition: transform 160ms ease;
+}
+
+.atgit-nudge-cta:hover {
+  background: #2b2b75;
+  border-color: #2b2b75;
+  transform: translateY(-1px);
+}
+
+.atgit-nudge-cta:hover::after {
+  transform: translateX(3px);
+}
+
+.atgit-nudge-cta:focus-visible,
+.atgit-nudge-close:focus-visible {
+  outline: 2px solid var(--atgit-sky);
+  outline-offset: 3px;
+}
+
+.atgit-nudge-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  place-items: center;
+  color: var(--atgit-ink);
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 20px;
+  line-height: 1;
+  opacity: 0.5;
+  transition: background 140ms ease, opacity 140ms ease;
+}
+
+.atgit-nudge-close:hover {
+  background: rgba(32, 32, 92, 0.08);
+  opacity: 1;
+}
+
+@keyframes atgit-nudge-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(-18px, 22px, 0) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes atgit-plane-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes atgit-plane-ring {
+  0%,
+  50% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  70% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes atgit-dot-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.85);
+    opacity: 0.65;
+  }
+}
+
+@media (max-width: 600px) {
+  [data-atgit-offer-host] {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    width: auto;
+    padding: 20px 46px 20px 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-atgit-offer-host],
+  .atgit-plane-wrap,
+  .atgit-plane-wrap::after,
+  .atgit-nudge-eyebrow::before {
+    animation: none;
+  }
+
+  .atgit-nudge-cta,
+  .atgit-nudge-cta::after,
+  .atgit-nudge-close {
+    transition: none;
+  }
 }
 </style>
 
 <script data-atgit-offer="js">
-// Offer script — DOM manipulation only (no HTML authoring).
+// Incomplete-booking nudge — DOM APIs only and safe to re-run.
 (function () {
-  var existing = document.querySelector("[data-atgit-offer-host]");
-  if (existing) existing.remove();
+  "use strict";
 
-  var host = document.createElement("div");
-  host.setAttribute("data-atgit-offer-host", "1");
+  var timerKey = "__atgitIncompleteBookingTimer";
+  var svgNamespace = "http://www.w3.org/2000/svg";
 
-  var title = document.createElement("strong");
-  title.textContent = "ATGitOps offer";
-
-  var note = document.createElement("span");
-  note.style.marginLeft = "8px";
-  note.style.opacity = "0.8";
-  note.textContent = "Edit Styles + JS to customize.";
-
-  host.appendChild(title);
-  host.appendChild(note);
-
-  var target =
-    document.querySelector("main") ||
-    document.querySelector("#content") ||
-    document.body;
-  if (target) {
-    target.insertBefore(host, target.firstChild);
+  if (window[timerKey]) {
+    window.clearTimeout(window[timerKey]);
+    window[timerKey] = null;
   }
+
+  function removeExistingOffers() {
+    var existing = document.querySelectorAll("[data-atgit-offer-host]");
+    Array.prototype.forEach.call(existing, function (node) {
+      node.remove();
+    });
+  }
+
+  function makeTextElement(tagName, className, text) {
+    var element = document.createElement(tagName);
+    element.className = className;
+    element.textContent = text;
+    return element;
+  }
+
+  function makePlaneIcon() {
+    var icon = document.createElementNS(svgNamespace, "svg");
+    icon.setAttribute("class", "atgit-plane-icon");
+    icon.setAttribute("viewBox", "0 0 24 24");
+    icon.setAttribute("aria-hidden", "true");
+    icon.setAttribute("focusable", "false");
+
+    var plane = document.createElementNS(svgNamespace, "path");
+    plane.setAttribute(
+      "d",
+      "M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2 1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"
+    );
+
+    icon.appendChild(plane);
+    return icon;
+  }
+
+  function makeRouteRow() {
+    var route = document.createElement("div");
+    route.className = "atgit-nudge-route";
+    route.setAttribute("aria-hidden", "true");
+
+    route.appendChild(makeTextElement("span", "", "Saved trip"));
+
+    var line = document.createElement("span");
+    line.className = "atgit-nudge-route-line";
+    route.appendChild(line);
+
+    route.appendChild(makeTextElement("span", "", "Almost booked"));
+    return route;
+  }
+
+  function renderOffer() {
+    removeExistingOffers();
+
+    if (!document.body) {
+      window[timerKey] = window.setTimeout(renderOffer, 50);
+      return;
+    }
+
+    var host = document.createElement("div");
+    host.setAttribute("data-atgit-offer-host", "incomplete-booking");
+    host.setAttribute("role", "region");
+    host.setAttribute("aria-label", "Incomplete booking reminder");
+    host.setAttribute("aria-live", "polite");
+
+    var iconWrap = document.createElement("span");
+    iconWrap.className = "atgit-plane-wrap";
+    iconWrap.appendChild(makePlaneIcon());
+
+    var copy = document.createElement("div");
+    copy.className = "atgit-nudge-copy";
+    copy.appendChild(
+      makeTextElement("span", "atgit-nudge-eyebrow", "Still in progress")
+    );
+    copy.appendChild(
+      makeTextElement("strong", "atgit-nudge-title", "Your trip is waiting")
+    );
+    copy.appendChild(makeRouteRow());
+    copy.appendChild(
+      makeTextElement(
+        "span",
+        "atgit-nudge-message",
+        "Resume your booking in a few taps before seats and fares change."
+      )
+    );
+
+    var continueLink = makeTextElement(
+      "a",
+      "atgit-nudge-cta",
+      "Continue booking"
+    );
+    continueLink.href = "/booking/flight-select.html";
+    continueLink.setAttribute("aria-label", "Continue your incomplete booking");
+    copy.appendChild(continueLink);
+
+    var closeButton = makeTextElement("button", "atgit-nudge-close", "\u00d7");
+    closeButton.type = "button";
+    closeButton.setAttribute("aria-label", "Dismiss booking reminder");
+    closeButton.addEventListener("click", function () {
+      host.remove();
+    });
+
+    host.appendChild(iconWrap);
+    host.appendChild(copy);
+    host.appendChild(closeButton);
+    document.body.appendChild(host);
+  }
+
+  renderOffer();
 })();
 </script>
