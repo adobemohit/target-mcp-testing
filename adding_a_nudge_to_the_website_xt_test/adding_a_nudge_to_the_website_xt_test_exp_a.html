@@ -1,0 +1,274 @@
+<style data-atgit-offer="css">
+/* Horizon welcome nudge — bottom-left, brand-aligned */
+[data-atgit-offer-host] {
+  box-sizing: border-box;
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 99999;
+  width: min(340px, calc(100vw - 40px));
+  margin: 0;
+  padding: 0;
+  font-family: Figtree, sans-serif;
+  color: rgb(14, 33, 54);
+  pointer-events: none;
+}
+
+[data-atgit-offer-host] *,
+[data-atgit-offer-host] *::before,
+[data-atgit-offer-host] *::after {
+  box-sizing: border-box;
+}
+
+[data-atgit-offer-host] .atgit-nudge {
+  pointer-events: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 18px 16px;
+  background: rgb(242, 247, 251);
+  color: rgb(14, 33, 54);
+  border: 1px solid rgba(14, 33, 54, 0.12);
+  border-radius: 14px;
+  box-shadow:
+    0 18px 40px rgba(10, 24, 40, 0.16),
+    0 2px 0 rgba(255, 255, 255, 0.65) inset;
+  font-family: Figtree, sans-serif;
+  transform: translateY(12px);
+  opacity: 0;
+  animation: atgit-nudge-in 420ms ease forwards;
+}
+
+[data-atgit-offer-host] .atgit-nudge.is-leaving {
+  animation: atgit-nudge-out 220ms ease forwards;
+}
+
+@keyframes atgit-nudge-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes atgit-nudge-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+[data-atgit-offer-host] .atgit-nudge-eyebrow {
+  margin: 0;
+  font-family: Figtree, sans-serif;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(14, 33, 54, 0.62);
+}
+
+[data-atgit-offer-host] .atgit-nudge-title {
+  margin: 0;
+  padding-right: 28px;
+  font-family: Figtree, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: rgb(14, 33, 54);
+}
+
+[data-atgit-offer-host] .atgit-nudge-copy {
+  margin: 0;
+  font-family: Figtree, sans-serif;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: rgba(14, 33, 54, 0.78);
+}
+
+[data-atgit-offer-host] .atgit-nudge-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+[data-atgit-offer-host] .atgit-nudge-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(14, 33, 54);
+  color: rgb(242, 247, 251);
+  font-family: Figtree, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 650;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+[data-atgit-offer-host] .atgit-nudge-cta:hover,
+[data-atgit-offer-host] .atgit-nudge-cta:focus-visible {
+  background: rgb(10, 24, 40);
+  outline: none;
+}
+
+[data-atgit-offer-host] .atgit-nudge-secondary {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font-family: Figtree, sans-serif;
+  font-size: 0.88rem;
+  font-weight: 550;
+  color: rgba(14, 33, 54, 0.68);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+[data-atgit-offer-host] .atgit-nudge-secondary:hover,
+[data-atgit-offer-host] .atgit-nudge-secondary:focus-visible {
+  color: rgb(14, 33, 54);
+  outline: none;
+}
+
+[data-atgit-offer-host] .atgit-nudge-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(14, 33, 54, 0.7);
+  font-family: Figtree, sans-serif;
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+[data-atgit-offer-host] .atgit-nudge-close:hover,
+[data-atgit-offer-host] .atgit-nudge-close:focus-visible {
+  background: rgba(14, 33, 54, 0.08);
+  color: rgb(14, 33, 54);
+  outline: none;
+}
+
+@media (max-width: 520px) {
+  [data-atgit-offer-host] {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    width: auto;
+  }
+}
+</style>
+
+<script data-atgit-offer="js">
+(function () {
+  var STORAGE_KEY = "atgit-horizon-welcome-nudge-dismissed";
+
+  document.querySelectorAll("[data-atgit-offer-host]").forEach(function (node) {
+    node.remove();
+  });
+
+  try {
+    if (window.sessionStorage && sessionStorage.getItem(STORAGE_KEY) === "1") {
+      return;
+    }
+  } catch (e) {}
+
+  var host = document.createElement("div");
+  host.setAttribute("data-atgit-offer-host", "1");
+  host.setAttribute("role", "region");
+  host.setAttribute("aria-label", "Horizon welcome");
+
+  var panel = document.createElement("div");
+  panel.className = "atgit-nudge";
+
+  var closeBtn = document.createElement("button");
+  closeBtn.type = "button";
+  closeBtn.className = "atgit-nudge-close";
+  closeBtn.setAttribute("aria-label", "Dismiss welcome message");
+  closeBtn.textContent = "×";
+
+  var eyebrow = document.createElement("p");
+  eyebrow.className = "atgit-nudge-eyebrow";
+  eyebrow.textContent = "Welcome to Horizon";
+
+  var title = document.createElement("h2");
+  title.className = "atgit-nudge-title";
+  title.textContent = "Ready when you are";
+
+  var copy = document.createElement("p");
+  copy.className = "atgit-nudge-copy";
+  copy.textContent =
+    "Compare live fares across 500+ airlines and book with clear totals—no tab-hopping required.";
+
+  var actions = document.createElement("div");
+  actions.className = "atgit-nudge-actions";
+
+  var cta = document.createElement("a");
+  cta.className = "atgit-nudge-cta";
+  cta.href = "#search";
+  cta.textContent = "Book a flight";
+
+  var later = document.createElement("button");
+  later.type = "button";
+  later.className = "atgit-nudge-secondary";
+  later.textContent = "Maybe later";
+
+  function dismiss() {
+    panel.classList.add("is-leaving");
+    try {
+      if (window.sessionStorage) sessionStorage.setItem(STORAGE_KEY, "1");
+    } catch (err) {}
+    window.setTimeout(function () {
+      if (host.parentNode) host.remove();
+    }, 220);
+  }
+
+  closeBtn.addEventListener("click", dismiss);
+  later.addEventListener("click", dismiss);
+  cta.addEventListener("click", function () {
+    try {
+      if (window.sessionStorage) sessionStorage.setItem(STORAGE_KEY, "1");
+    } catch (err) {}
+    var search = document.querySelector("#search") || document.querySelector("#flight-search");
+    if (search && typeof search.scrollIntoView === "function") {
+      search.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  });
+
+  actions.appendChild(cta);
+  actions.appendChild(later);
+
+  panel.appendChild(closeBtn);
+  panel.appendChild(eyebrow);
+  panel.appendChild(title);
+  panel.appendChild(copy);
+  panel.appendChild(actions);
+  host.appendChild(panel);
+
+  var mount = document.body;
+  if (mount) mount.appendChild(host);
+})();
+</script>
