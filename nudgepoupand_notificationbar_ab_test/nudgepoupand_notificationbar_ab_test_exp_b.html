@@ -13,38 +13,13 @@
   position: relative;
   z-index: 1000;
   width: 100%;
-  overflow: hidden;
   background: rgb(10, 24, 40);
   color: rgba(255, 255, 255, 0.92);
   font-family: Figtree, sans-serif;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-[data-atgit-offer-host][data-atgit-role="notif-bar"]::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 45%;
-  height: 100%;
-  pointer-events: none;
-  background: linear-gradient(
-    105deg,
-    transparent 0%,
-    transparent 35%,
-    rgba(242, 247, 251, 0.08) 45%,
-    rgba(242, 247, 251, 0.22) 50%,
-    rgba(242, 247, 251, 0.08) 55%,
-    transparent 65%,
-    transparent 100%
-  );
-  transform: translateX(-120%) skewX(-18deg);
-  animation: atgit-shine 3.2s ease-in-out infinite;
-}
-
 [data-atgit-offer-host] .atgit-notif-inner {
-  position: relative;
-  z-index: 1;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -182,11 +157,6 @@
 @keyframes atgit-pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.45; transform: scale(0.85); }
-}
-
-@keyframes atgit-shine {
-  0% { transform: translateX(-120%) skewX(-18deg); }
-  45%, 100% { transform: translateX(280%) skewX(-18deg); }
 }
 
 @media (max-width: 720px) {
