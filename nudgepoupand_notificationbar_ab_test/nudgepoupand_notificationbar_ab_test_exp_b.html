@@ -1,5 +1,5 @@
 <style data-atgit-offer="css">
-/* Horizon — flight news notification bar */
+/* Horizon — warm yellow flight news notification bar */
 [data-atgit-offer-host] {
   box-sizing: border-box;
 }
@@ -13,10 +13,11 @@
   position: relative;
   z-index: 1000;
   width: 100%;
-  background: rgb(10, 24, 40);
-  color: rgba(255, 255, 255, 0.92);
+  background: linear-gradient(90deg, #ffe566 0%, #ffd54a 48%, #ffc933 100%);
+  color: rgb(14, 33, 54);
   font-family: Figtree, sans-serif;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(14, 33, 54, 0.12);
+  box-shadow: 0 2px 10px rgba(14, 33, 54, 0.08);
 }
 
 [data-atgit-offer-host] .atgit-notif-inner {
@@ -36,8 +37,8 @@
   gap: 6px;
   padding: 3px 10px;
   border-radius: 999px;
-  background: rgba(242, 247, 251, 0.12);
-  color: rgb(242, 247, 251);
+  background: rgb(14, 33, 54);
+  color: #ffe566;
   font-family: Figtree, sans-serif;
   font-size: 11px;
   font-weight: 700;
@@ -45,13 +46,14 @@
   text-transform: uppercase;
   line-height: 1.2;
   white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(14, 33, 54, 0.18);
 }
 
 [data-atgit-offer-host] .atgit-notif-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: rgb(242, 247, 251);
+  background: #ffe566;
   animation: atgit-pulse 1.6s ease-in-out infinite;
 }
 
@@ -82,9 +84,9 @@
   padding: 0 28px 0 0;
   font-family: Figtree, sans-serif;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.35;
-  color: rgba(255, 255, 255, 0.88);
+  color: rgb(14, 33, 54);
   white-space: nowrap;
 }
 
@@ -93,7 +95,7 @@
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: rgba(242, 247, 251, 0.45);
+  background: rgba(14, 33, 54, 0.35);
   flex: 0 0 auto;
 }
 
@@ -102,11 +104,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 999px;
-  border: 1px solid rgba(242, 247, 251, 0.28);
-  background: transparent;
-  color: rgb(242, 247, 251);
+  border: 1px solid transparent;
+  background: rgb(14, 33, 54);
+  color: #ffe566;
   font-family: Figtree, sans-serif;
   font-size: 12px;
   font-weight: 600;
@@ -114,14 +116,16 @@
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 1px 3px rgba(14, 33, 54, 0.2);
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
 }
 
 [data-atgit-offer-host] .atgit-notif-cta:hover,
 [data-atgit-offer-host] .atgit-notif-cta:focus-visible {
-  background: rgba(242, 247, 251, 0.1);
-  border-color: rgba(242, 247, 251, 0.55);
+  background: rgb(10, 24, 40);
+  color: #fff3a8;
   outline: none;
+  transform: translateY(-1px);
 }
 
 [data-atgit-offer-host] .atgit-notif-close {
@@ -134,18 +138,19 @@
   border: 0;
   border-radius: 999px;
   background: transparent;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(14, 33, 54, 0.65);
   font-family: Figtree, sans-serif;
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
   padding: 0;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 [data-atgit-offer-host] .atgit-notif-close:hover,
 [data-atgit-offer-host] .atgit-notif-close:focus-visible {
-  color: rgb(242, 247, 251);
-  background: rgba(242, 247, 251, 0.1);
+  color: rgb(14, 33, 54);
+  background: rgba(14, 33, 54, 0.1);
   outline: none;
 }
 
@@ -225,7 +230,7 @@
   track.className = "atgit-marquee-track";
 
   function appendItems(container) {
-    newsItems.forEach(function (text, index) {
+    newsItems.forEach(function (text) {
       var item = document.createElement("span");
       item.className = "atgit-marquee-item";
       item.textContent = text;
@@ -235,10 +240,6 @@
       sep.className = "atgit-marquee-sep";
       sep.setAttribute("aria-hidden", "true");
       container.appendChild(sep);
-
-      if (index === newsItems.length - 1) {
-        // keep trailing separator for continuous loop spacing
-      }
     });
   }
 
