@@ -1,5 +1,5 @@
 <style data-atgit-offer="css">
-/* Horizon welcome nudge — bottom-left, brand-aligned */
+/* Horizon welcome nudge — dark footer theme */
 [data-atgit-offer-host] {
   box-sizing: border-box;
   position: fixed;
@@ -10,7 +10,7 @@
   margin: 0;
   padding: 0;
   font-family: Figtree, sans-serif;
-  color: rgb(14, 33, 54);
+  color: rgba(255, 255, 255, 0.92);
   pointer-events: none;
 }
 
@@ -26,14 +26,14 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 18px 18px 16px;
-  background: rgb(242, 247, 251);
-  color: rgb(14, 33, 54);
-  border: 1px solid rgba(14, 33, 54, 0.12);
-  border-radius: 14px;
+  padding: 20px 20px 18px;
+  background: linear-gradient(165deg, rgb(14, 33, 54) 0%, rgb(10, 24, 40) 100%);
+  color: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(242, 247, 251, 0.12);
+  border-radius: 16px;
   box-shadow:
-    0 18px 40px rgba(10, 24, 40, 0.16),
-    0 2px 0 rgba(255, 255, 255, 0.65) inset;
+    0 22px 48px rgba(10, 24, 40, 0.42),
+    0 1px 0 rgba(242, 247, 251, 0.08) inset;
   font-family: Figtree, sans-serif;
   transform: translateY(12px);
   opacity: 0;
@@ -71,20 +71,20 @@
   font-family: Figtree, sans-serif;
   font-size: 11px;
   font-weight: 650;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(14, 33, 54, 0.62);
+  color: rgba(242, 247, 251, 0.62);
 }
 
 [data-atgit-offer-host] .atgit-nudge-title {
   margin: 0;
   padding-right: 28px;
   font-family: Figtree, sans-serif;
-  font-size: 1.2rem;
+  font-size: 1.22rem;
   font-weight: 700;
   line-height: 1.25;
   letter-spacing: -0.02em;
-  color: rgb(14, 33, 54);
+  color: rgba(255, 255, 255, 0.96);
 }
 
 [data-atgit-offer-host] .atgit-nudge-copy {
@@ -92,15 +92,15 @@
   font-family: Figtree, sans-serif;
   font-size: 0.92rem;
   line-height: 1.45;
-  color: rgba(14, 33, 54, 0.78);
+  color: rgba(255, 255, 255, 0.78);
 }
 
 [data-atgit-offer-host] .atgit-nudge-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
-  margin-top: 2px;
+  gap: 12px;
+  margin-top: 4px;
 }
 
 [data-atgit-offer-host] .atgit-nudge-cta {
@@ -111,19 +111,20 @@
   padding: 0 16px;
   border: 0;
   border-radius: 999px;
-  background: rgb(14, 33, 54);
-  color: rgb(242, 247, 251);
+  background: rgb(242, 247, 251);
+  color: rgb(14, 33, 54);
   font-family: Figtree, sans-serif;
   font-size: 0.9rem;
   font-weight: 650;
   text-decoration: none;
   cursor: pointer;
-  transition: background 160ms ease, transform 160ms ease;
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
 }
 
 [data-atgit-offer-host] .atgit-nudge-cta:hover,
 [data-atgit-offer-host] .atgit-nudge-cta:focus-visible {
-  background: rgb(10, 24, 40);
+  background: #ffffff;
+  color: rgb(10, 24, 40);
   outline: none;
 }
 
@@ -134,7 +135,7 @@
   font-family: Figtree, sans-serif;
   font-size: 0.88rem;
   font-weight: 550;
-  color: rgba(14, 33, 54, 0.68);
+  color: rgba(242, 247, 251, 0.72);
   text-decoration: underline;
   text-underline-offset: 2px;
   cursor: pointer;
@@ -142,7 +143,7 @@
 
 [data-atgit-offer-host] .atgit-nudge-secondary:hover,
 [data-atgit-offer-host] .atgit-nudge-secondary:focus-visible {
-  color: rgb(14, 33, 54);
+  color: rgb(242, 247, 251);
   outline: none;
 }
 
@@ -158,7 +159,7 @@
   border: 0;
   border-radius: 999px;
   background: transparent;
-  color: rgba(14, 33, 54, 0.7);
+  color: rgba(242, 247, 251, 0.72);
   font-family: Figtree, sans-serif;
   font-size: 1.15rem;
   line-height: 1;
@@ -167,8 +168,8 @@
 
 [data-atgit-offer-host] .atgit-nudge-close:hover,
 [data-atgit-offer-host] .atgit-nudge-close:focus-visible {
-  background: rgba(14, 33, 54, 0.08);
-  color: rgb(14, 33, 54);
+  background: rgba(242, 247, 251, 0.1);
+  color: rgb(242, 247, 251);
   outline: none;
 }
 
@@ -208,7 +209,7 @@
   closeBtn.type = "button";
   closeBtn.className = "atgit-nudge-close";
   closeBtn.setAttribute("aria-label", "Dismiss welcome message");
-  closeBtn.textContent = "×";
+  closeBtn.textContent = "\u00d7";
 
   var eyebrow = document.createElement("p");
   eyebrow.className = "atgit-nudge-eyebrow";
@@ -221,7 +222,7 @@
   var copy = document.createElement("p");
   copy.className = "atgit-nudge-copy";
   copy.textContent =
-    "Compare live fares across 500+ airlines and book with clear totals—no tab-hopping required.";
+    "Compare live fares across 500+ airlines and book with clear totals\u2014no tab-hopping required.";
 
   var actions = document.createElement("div");
   actions.className = "atgit-nudge-actions";
