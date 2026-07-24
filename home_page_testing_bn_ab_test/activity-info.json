@@ -1,0 +1,38 @@
+{
+  "activity_id": 0,
+  "activity_name": "home page testing-bn",
+  "activity_description": "",
+  "activity_status": "inactive",
+  "activity_start_date": "",
+  "activity_end_date": "",
+  "activity_type": "AB",
+  "activity_location": "https://adobemohit.github.io/flight/",
+  "activity_target": "all_visitors",
+  "mbox_name": "target-global-mbox",
+  "variants": [
+    {
+      "variant": "variant_a",
+      "html_file": "home_page_testing_bn_ab_test_exp_a.html",
+      "offer_name": "home page banner test",
+      "offer_id": null,
+      "experience_name": "Experience - new activity",
+      "traffic_percent": 40,
+      "mode": "create_or_update"
+    },
+    {
+      "variant": "variant_b",
+      "html_file": "home_page_testing_bn_ab_test_exp_b.html",
+      "offer_name": "Experience B - home page testing-bn",
+      "offer_id": null,
+      "experience_name": "Experience B - home page testing-bn",
+      "traffic_percent": 60,
+      "mode": "create_or_update"
+    }
+  ],
+  "actions": {
+    "push_offer": true,
+    "attach_offer_to_variant": true,
+    "sync_activity_state": false,
+    "create_activity_if_missing": true
+  }
+}

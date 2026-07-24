@@ -1,0 +1,313 @@
+<style data-atgit-offer="css">
+[data-atgit-offer-host] {
+  position: fixed;
+  bottom: 28px;
+  left: 28px;
+  z-index: 9999;
+  width: 320px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  border: 1px solid rgba(14, 33, 54, 0.08);
+  border-radius: 16px;
+  padding: 0;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.75) inset,
+    0 12px 40px rgba(14, 33, 54, 0.14),
+    0 2px 8px rgba(14, 33, 54, 0.06);
+  font-family: "Figtree", sans-serif;
+  color: var(--ink, #0e2136);
+  overflow: hidden;
+  pointer-events: auto;
+  animation: atgit-slideUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes atgit-slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+[data-atgit-offer-host] [data-atgit-header] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px 10px;
+}
+
+[data-atgit-offer-host] [data-atgit-header] [data-atgit-badge] {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #2a78ab;
+}
+
+[data-atgit-offer-host] [data-atgit-header] [data-atgit-badge]::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6eb6e0, #2a78ab);
+  box-shadow: 0 0 6px rgba(42, 120, 171, 0.4);
+  flex-shrink: 0;
+  animation: atgit-pulse 2s ease-in-out infinite;
+}
+
+@keyframes atgit-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+[data-atgit-offer-host] [data-atgit-close] {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  line-height: 1;
+  color: #8fa3b5;
+  font-size: 1.1rem;
+  transition: color 0.2s ease;
+}
+
+[data-atgit-offer-host] [data-atgit-close]:hover {
+  color: #4a6278;
+}
+
+[data-atgit-offer-host] [data-atgit-body] {
+  padding: 0 18px 6px;
+}
+
+[data-atgit-offer-host] [data-atgit-title] {
+  font-family: "Syne", sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: #0e2136;
+  margin: 0 0 4px;
+}
+
+[data-atgit-offer-host] [data-atgit-sub] {
+  font-size: 0.76rem;
+  color: #4a6278;
+  line-height: 1.4;
+  margin: 0;
+}
+
+[data-atgit-offer-host] [data-atgit-route] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 18px;
+  padding: 10px 12px;
+  background: rgba(14, 33, 54, 0.035);
+  border: 1px solid rgba(14, 33, 54, 0.05);
+  border-radius: 10px;
+}
+
+[data-atgit-offer-host] [data-atgit-field] {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+[data-atgit-offer-host] [data-atgit-field-label] {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #8fa3b5;
+  margin-bottom: 2px;
+}
+
+[data-atgit-offer-host] [data-atgit-field-value] {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #0e2136;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[data-atgit-offer-host] [data-atgit-arrow] {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6eb6e0, #2a78ab);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.7rem;
+  margin-top: 8px;
+}
+
+[data-atgit-offer-host] [data-atgit-flight-note] {
+  margin: 0 18px 10px;
+  padding: 8px 10px;
+  background: rgba(42, 120, 171, 0.06);
+  border-left: 3px solid #2a78ab;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.7rem;
+  color: #4a6278;
+  line-height: 1.4;
+}
+
+[data-atgit-offer-host] [data-atgit-flight-note] strong {
+  color: #0e2136;
+}
+
+[data-atgit-offer-host] [data-atgit-footer] {
+  padding: 6px 18px 16px;
+}
+
+[data-atgit-offer-host] [data-atgit-cta] {
+  display: block;
+  width: 100%;
+  padding: 10px 0;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #2a78ab 0%, #1b5f8c 100%);
+  color: #fff;
+  font-family: "Figtree", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+  box-shadow: 0 2px 8px rgba(42, 120, 171, 0.25);
+}
+
+[data-atgit-offer-host] [data-atgit-cta]:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(42, 120, 171, 0.35);
+  background: linear-gradient(135deg, #3388be 0%, #2272a0 100%);
+}
+
+[data-atgit-offer-host] [data-atgit-cta]:active {
+  transform: translateY(0);
+}
+</style>
+
+<script data-atgit-offer="js">
+(function () {
+  var existing = document.querySelector("[data-atgit-offer-host]");
+  if (existing) existing.remove();
+
+  var host = document.createElement("div");
+  host.setAttribute("data-atgit-offer-host", "1");
+
+  // ── header ──
+  var header = document.createElement("div");
+  header.setAttribute("data-atgit-header", "");
+
+  var badge = document.createElement("span");
+  badge.setAttribute("data-atgit-badge", "");
+  badge.textContent = "Incomplete booking";
+
+  var close = document.createElement("button");
+  close.setAttribute("data-atgit-close", "");
+  close.setAttribute("aria-label", "Dismiss");
+  close.textContent = "\u00d7";
+  close.addEventListener("click", function () {
+    host.style.transform = "translateY(12px)";
+    host.style.opacity = "0";
+    setTimeout(function () { host.remove(); }, 250);
+  });
+
+  header.appendChild(badge);
+  header.appendChild(close);
+  host.appendChild(header);
+
+  // ── body copy ──
+  var body = document.createElement("div");
+  body.setAttribute("data-atgit-body", "");
+
+  var title = document.createElement("h3");
+  title.setAttribute("data-atgit-title", "");
+  title.textContent = "Complete your flight booking";
+
+  var sub = document.createElement("p");
+  sub.setAttribute("data-atgit-sub", "");
+  sub.textContent = "Your trip is almost locked in\u2014finish details and seat selection before fares change.";
+
+  body.appendChild(title);
+  body.appendChild(sub);
+  host.appendChild(body);
+
+  // ── route card ──
+  var route = document.createElement("div");
+  route.setAttribute("data-atgit-route", "");
+
+  var fromField = document.createElement("div");
+  fromField.setAttribute("data-atgit-field", "");
+  var fromLabel = document.createElement("span");
+  fromLabel.setAttribute("data-atgit-field-label", "");
+  fromLabel.textContent = "From";
+  var fromValue = document.createElement("span");
+  fromValue.setAttribute("data-atgit-field-value", "");
+  fromValue.textContent = "New York (JFK)";
+  fromField.appendChild(fromLabel);
+  fromField.appendChild(fromValue);
+
+  var arrow = document.createElement("div");
+  arrow.setAttribute("data-atgit-arrow", "");
+  arrow.textContent = "\u2192";
+
+  var toField = document.createElement("div");
+  toField.setAttribute("data-atgit-field", "");
+  var toLabel = document.createElement("span");
+  toLabel.setAttribute("data-atgit-field-label", "");
+  toLabel.textContent = "To";
+  var toValue = document.createElement("span");
+  toValue.setAttribute("data-atgit-field-value", "");
+  toValue.textContent = "London (LHR)";
+  toField.appendChild(toLabel);
+  toField.appendChild(toValue);
+
+  route.appendChild(fromField);
+  route.appendChild(arrow);
+  route.appendChild(toField);
+  host.appendChild(route);
+
+  // ── last flight note ──
+  var note = document.createElement("div");
+  note.setAttribute("data-atgit-flight-note", "");
+  var noteStrong = document.createElement("strong");
+  noteStrong.textContent = "Last booked: ";
+  var noteText = document.createTextNode("JFK \u2192 LHR \u00b7 Economy \u00b7 $418 round trip");
+  note.appendChild(noteStrong);
+  note.appendChild(noteText);
+  host.appendChild(note);
+
+  // ── CTA footer ──
+  var footer = document.createElement("div");
+  footer.setAttribute("data-atgit-footer", "");
+
+  var cta = document.createElement("button");
+  cta.setAttribute("data-atgit-cta", "");
+  cta.textContent = "Complete booking";
+  cta.addEventListener("click", function () {
+    var searchSection = document.getElementById("search");
+    if (searchSection) {
+      searchSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  });
+
+  footer.appendChild(cta);
+  host.appendChild(footer);
+
+  document.body.appendChild(host);
+})();
+</script>
