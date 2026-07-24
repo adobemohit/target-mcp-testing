@@ -1,0 +1,237 @@
+<style data-atgit-offer="css">
+/* Cart Abandonment Nudge — bottom-right floating card */
+[data-atgit-offer-host] {
+  box-sizing: border-box;
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999999;
+  width: 360px;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
+  font-family: inherit;
+  overflow: hidden;
+  animation: atgit-slide-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes atgit-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+[data-atgit-offer-host] .atgit-header {
+  background: linear-gradient(135deg, #0f4c81 0%, #1a6fb5 100%);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+[data-atgit-offer-host] .atgit-header-text {
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+[data-atgit-offer-host] .atgit-dismiss {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: #ffffff;
+  font-size: 18px;
+  line-height: 1;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+[data-atgit-offer-host] .atgit-dismiss:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+[data-atgit-offer-host] .atgit-body {
+  padding: 20px 18px;
+}
+
+[data-atgit-offer-host] .atgit-route {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+[data-atgit-offer-host] .atgit-city {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+[data-atgit-offer-host] .atgit-arrow {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: #0f4c81;
+  font-size: 13px;
+  position: relative;
+}
+
+[data-atgit-offer-host] .atgit-arrow::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: #c8d6e5;
+}
+
+[data-atgit-offer-host] .atgit-arrow::after {
+  content: '✈';
+  font-size: 16px;
+}
+
+[data-atgit-offer-host] .atgit-msg {
+  font-size: 14px;
+  line-height: 1.55;
+  color: #444;
+  margin-bottom: 16px;
+}
+
+[data-atgit-offer-host] .atgit-msg strong {
+  color: #1a1a2e;
+}
+
+[data-atgit-offer-host] .atgit-cta {
+  display: block;
+  width: 100%;
+  padding: 12px 0;
+  background: linear-gradient(135deg, #0f4c81 0%, #1a6fb5 100%);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+[data-atgit-offer-host] .atgit-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(15, 76, 129, 0.35);
+}
+
+[data-atgit-offer-host] .atgit-cta:active {
+  transform: translateY(0);
+}
+
+[data-atgit-offer-host] .atgit-subtext {
+  text-align: center;
+  font-size: 11.5px;
+  color: #999;
+  margin-top: 10px;
+}
+</style>
+
+<script data-atgit-offer="js">
+// Cart Abandonment Nudge — DOM only, idempotent
+(function () {
+  /* ---------- tear down previous run ---------- */
+  var prev = document.querySelector("[data-atgit-offer-host]");
+  if (prev) prev.remove();
+
+  /* ---------- helpers ---------- */
+  function el(tag, attrs, children) {
+    var node = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      if (k === "className") node.className = attrs[k];
+      else if (k === "textContent") node.textContent = attrs[k];
+      else if (k === "onclick") node.onclick = attrs[k];
+      else node.setAttribute(k, attrs[k]);
+    });
+    if (children) children.forEach(function (c) { if (c) node.appendChild(c); });
+    return node;
+  }
+
+  /* ---------- host card ---------- */
+  var host = el("div", { "data-atgit-offer-host": "1" }, []);
+
+  /* ---- header ---- */
+  var dismissBtn = el("button", {
+    className: "atgit-dismiss",
+    textContent: "\u00d7",
+    "aria-label": "Dismiss"
+  });
+
+  var headerText = el("span", { className: "atgit-header-text", textContent: "Booking Reminder" });
+  var header = el("div", { className: "atgit-header" }, [headerText, dismissBtn]);
+
+  /* ---- body ---- */
+  /* Try to pull origin / destination from page content or fall back to defaults */
+  var originCode = "SFO";
+  var destCode   = "NYC";
+  var originFull = "San Francisco";
+  var destFull   = "New York";
+
+  /* Heuristic: scan visible text for airport codes like SFO → NYC */
+  var bodyText = (document.body.innerText || "").substring(0, 8000);
+  var codeRe = /\b([A-Z]{3})\s*(?:→|->|to|–|—)\s*([A-Z]{3})\b/;
+  var match = bodyText.match(codeRe);
+  if (match) {
+    originCode = match[1];
+    destCode   = match[2];
+  }
+
+  /* Route strip */
+  var originSpan = el("span", { className: "atgit-city", textContent: originCode });
+  var arrowSpan  = el("span", { className: "atgit-arrow" });
+  var destSpan   = el("span", { className: "atgit-city", textContent: destCode });
+  var route = el("div", { className: "atgit-route" }, [originSpan, arrowSpan, destSpan]);
+
+  /* Message */
+  var msg = el("div", { className: "atgit-msg" });
+  msg.innerHTML = "You left a flight from <strong>" + originCode + " to " + destCode + "</strong> in your cart. Prices may change — complete your booking now to lock in the best fare!";
+
+  /* CTA button */
+  var cta = el("button", {
+    className: "atgit-cta",
+    textContent: "Complete My Booking"
+  });
+  cta.onclick = function () {
+    /* Scroll to top or click primary booking CTA if present */
+    var bookingBtn = document.querySelector("[data-testid='booking-cta'], .book-btn, .booking-cta, [type='submit']");
+    if (bookingBtn) { bookingBtn.click(); }
+    else { window.scrollTo({ top: 0, behavior: "smooth" }); }
+  };
+
+  /* Urgency subtext */
+  var sub = el("div", { className: "atgit-subtext", textContent: "Limited seats available at this price" });
+
+  var body = el("div", { className: "atgit-body" }, [route, msg, cta, sub]);
+
+  host.appendChild(header);
+  host.appendChild(body);
+
+  /* ---------- dismiss ---------- */
+  dismissBtn.onclick = function () {
+    host.style.transition = "opacity 0.25s, transform 0.25s";
+    host.style.opacity = "0";
+    host.style.transform = "translateY(10px)";
+    setTimeout(function () { host.remove(); }, 260);
+  };
+
+  /* ---------- inject ---------- */
+  document.body.appendChild(host);
+})();
+</script>
