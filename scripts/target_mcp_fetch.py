@@ -51,19 +51,87 @@ def normalize_activity_type(activity_type: str | None) -> str:
 def list_target_activities(
     *,
     limit: int = 200,
-    name_contains: str | None = None,
+    offset: int | None = None,
+    sort_by: str | None = None,
+    state: str | None = None,
     activity_type: str | None = None,
+    name_contains: str | None = None,
+    starts_after: str | None = None,
+    starts_before: str | None = None,
+    modified_after: str | None = None,
+    ends_after: str | None = None,
+    ends_before: str | None = None,
+    workspace: str | None = None,
+    segment_id: str | None = None,
+    profile_attribute_id: str | None = None,
+    priority: int | None = None,
+    mbox: str | None = None,
+    offer_id: str | None = None,
+    view_id: str | None = None,
 ) -> list[dict]:
+    """List Adobe Target activities with server-side filtering + sorting.
+
+    Every filter is passed straight through to the MCP `list_target_activities`
+    tool — the Adobe Admin API does the filter and sort work, so the response
+    is already the exact page the caller wants (up to `limit`, MCP-capped at
+    200 per page).
+    """
     client = connect_client()
     params: dict = {"limit": limit}
-    if name_contains:
-        params["name_contains"] = name_contains
+    if offset is not None:
+        params["offset"] = offset
+    if sort_by:
+        params["sort_by"] = sort_by
+    if state:
+        params["state"] = state
     if activity_type:
         params["activity_type"] = normalize_activity_type(activity_type)
+    if name_contains:
+        params["name_contains"] = name_contains
+    if starts_after:
+        params["starts_after"] = starts_after
+    if starts_before:
+        params["starts_before"] = starts_before
+    if modified_after:
+        params["modified_after"] = modified_after
+    if ends_after:
+        params["ends_after"] = ends_after
+    if ends_before:
+        params["ends_before"] = ends_before
+    if workspace:
+        params["workspace"] = workspace
+    if segment_id:
+        params["segment_id"] = segment_id
+    if profile_attribute_id:
+        params["profile_attribute_id"] = profile_attribute_id
+    if priority is not None:
+        params["priority"] = int(priority)
+    if mbox:
+        params["mbox"] = mbox
+    if offer_id:
+        params["offer_id"] = offer_id
+    if view_id:
+        params["view_id"] = view_id
 
     response = client.call_tool("list_target_activities", params)
     result = extract_tool_result(response)
     return extract_named_items(result, "activities")
+
+
+def list_target_workspaces() -> list[dict]:
+    """Every Adobe Target workspace this user has access to.
+
+    Composer's workspace picker uses this — workspaces determine where a
+    newly-created activity lives in Target Admin. Not every tenant has
+    multiple workspaces; single-tenant orgs return one 'default' workspace.
+    """
+    client = connect_client()
+    response = client.call_tool("list_target_workspaces", {})
+    result = extract_tool_result(response)
+    return (
+        extract_named_items(result, "workspaces")
+        or extract_named_items(result, "items")
+    )
 
 
 def get_activity_tool_name(activity_type: str) -> str:
@@ -96,6 +164,38 @@ def deactivate_target_activity(activity_id: int) -> dict:
         "state": "deactivated",
         "result": extract_tool_result(response),
     }
+
+
+def preview_target_activity(
+    activity_id: int,
+    activity_type: str | None = None,
+    url: str | None = None,
+) -> dict:
+    """Generate QA preview URLs that bypass audience targeting.
+
+    Wraps Adobe Target MCP's `preview_activity` tool. The tool returns one
+    preview URL per experience so QA can view each variant directly without
+    matching the activity's normal audience rules. `activity_type` is passed
+    through when known — some tool versions require it, others ignore it.
+
+    Form-based (non-VEC) activities require a `url` — the page URL where the
+    mbox is deployed. Without it the tool returns an empty `preview_urls` and
+    a `message` telling the caller to provide `url`. We pass through the
+    caller-supplied page URL when available so QA links resolve on the first
+    call. VEC activities are unaffected by an extra `url` param.
+
+    Returns the raw MCP payload; the API layer is responsible for extracting
+    a normalized list of `{experience, url}` pairs (schema has varied
+    across MCP releases).
+    """
+    client = connect_client()
+    params: dict = {"activity_id": int(activity_id)}
+    if activity_type:
+        params["activity_type"] = normalize_activity_type(activity_type)
+    if url:
+        params["url"] = url
+    response = client.call_tool("preview_activity", params)
+    return extract_tool_result(response)
 
 
 def _extract_id(result: dict) -> int | None:
@@ -238,6 +338,7 @@ def _build_create_activity_params(
     description: str,
     starts_at: str,
     ends_at: str,
+    workspace_id: str | None = None,
     include_offer_ids: bool = True,
     include_visitor_percentage: bool = True,
 ) -> dict:
@@ -277,6 +378,8 @@ def _build_create_activity_params(
         params["starts_at"] = starts_at
     if ends_at:
         params["ends_at"] = ends_at
+    if workspace_id:
+        params["workspace_id"] = str(workspace_id)
 
     return params
 
@@ -372,6 +475,7 @@ def create_draft_activity(payload: dict) -> dict:
         description=(payload.get("activity_description") or "").strip(),
         starts_at=(payload.get("activity_start_date") or "").strip(),
         ends_at=(payload.get("activity_end_date") or "").strip(),
+        workspace_id=(str(payload.get("workspace_id") or "").strip() or None),
     )
     create_params = _build_create_activity_params(**create_kwargs)
 
@@ -523,6 +627,59 @@ def list_target_mboxes(*, limit: int = 100, offset: int = 0, name: str | None = 
     response = client.call_tool("list_target_mboxes", params)
     result = extract_tool_result(response)
     return extract_named_items(result, "mboxes")
+
+
+def get_target_mbox(mbox_name: str) -> dict:
+    """Fetch full details of a single mbox (locations, params seen, etc.)."""
+    client = connect_client()
+    response = client.call_tool(
+        "get_target_mbox", {"mbox_name": mbox_name}
+    )
+    return extract_tool_result(response)
+
+
+def list_target_mbox_profile_attributes(
+    *, limit: int = 200, offset: int = 0
+) -> list[dict]:
+    """Every visitor-profile attribute Adobe Target has recorded for this
+    tenant. These are the `profile.*` variables usable in Target activity
+    scripts and audience rules."""
+    client = connect_client()
+    response = client.call_tool(
+        "list_target_mbox_profile_attributes",
+        {"limit": limit, "offset": offset},
+    )
+    result = extract_tool_result(response)
+    return extract_named_items(result, "attributes") or extract_named_items(
+        result, "mbox_profile_attributes"
+    )
+
+
+def list_target_response_tokens() -> list[dict]:
+    """Every response token registered on this tenant. Response tokens are the
+    strings Target injects into `adobe.target.getOffer` response metadata so
+    on-page code can read activity/experience info at delivery time."""
+    client = connect_client()
+    response = client.call_tool("list_target_response_tokens", {})
+    result = extract_tool_result(response)
+    return (
+        extract_named_items(result, "response_tokens")
+        or extract_named_items(result, "responseTokens")
+        or extract_named_items(result, "items")
+    )
+
+
+def create_target_response_token(
+    name: str, description: str | None = None
+) -> dict:
+    """Register a new response token. `name` is the key that will appear in
+    `response.tnt.responseTokens[<name>]` at delivery time."""
+    client = connect_client()
+    params: dict = {"name": name}
+    if description:
+        params["description"] = description
+    response = client.call_tool("create_target_response_token", params)
+    return extract_tool_result(response)
 
 
 def update_activity_schedule(
@@ -781,8 +938,33 @@ def main() -> int:
 
     list_parser = subparsers.add_parser("list")
     list_parser.add_argument("--limit", type=int, default=200)
+    list_parser.add_argument("--offset", type=int, default=None)
+    list_parser.add_argument(
+        "--sort-by",
+        default=None,
+        help="Prefix with '-' for descending (e.g. '-modifiedAt').",
+    )
+    list_parser.add_argument(
+        "--state",
+        default=None,
+        help="approved | deactivated | paused | saved",
+    )
     list_parser.add_argument("--name-contains")
     list_parser.add_argument("--activity-type")
+    list_parser.add_argument("--starts-after")
+    list_parser.add_argument("--starts-before")
+    list_parser.add_argument("--modified-after")
+    list_parser.add_argument("--ends-after")
+    list_parser.add_argument("--ends-before")
+    list_parser.add_argument("--workspace")
+    list_parser.add_argument("--segment-id")
+    list_parser.add_argument("--profile-attribute-id")
+    list_parser.add_argument("--priority", type=int, default=None)
+    list_parser.add_argument("--mbox")
+    list_parser.add_argument("--offer-id")
+    list_parser.add_argument("--view-id")
+
+    subparsers.add_parser("list-workspaces")
 
     get_parser = subparsers.add_parser("get")
     get_parser.add_argument("activity_id", type=int)
@@ -804,6 +986,19 @@ def main() -> int:
     deactivate_parser = subparsers.add_parser("deactivate")
     deactivate_parser.add_argument("activity_id", type=int)
 
+    preview_parser = subparsers.add_parser(
+        "preview",
+        help="Generate QA preview URLs for each experience of an activity.",
+    )
+    preview_parser.add_argument("activity_id", type=int)
+    preview_parser.add_argument("--activity-type", default=None)
+    preview_parser.add_argument(
+        "--url",
+        default=None,
+        help="Page URL where the mbox is deployed. Required by MCP for "
+        "form-based (non-VEC) activities.",
+    )
+
     draft_parser = subparsers.add_parser("create-draft")
     draft_parser.add_argument("--payload-json", required=True)
 
@@ -821,6 +1016,19 @@ def main() -> int:
     mboxes_parser.add_argument("--limit", type=int, default=100)
     mboxes_parser.add_argument("--offset", type=int, default=0)
     mboxes_parser.add_argument("--name")
+
+    get_mbox_parser = subparsers.add_parser("get-mbox")
+    get_mbox_parser.add_argument("mbox_name")
+
+    profile_attrs_parser = subparsers.add_parser("list-mbox-profile-attributes")
+    profile_attrs_parser.add_argument("--limit", type=int, default=200)
+    profile_attrs_parser.add_argument("--offset", type=int, default=0)
+
+    subparsers.add_parser("list-response-tokens")
+
+    create_token_parser = subparsers.add_parser("create-response-token")
+    create_token_parser.add_argument("name")
+    create_token_parser.add_argument("--description", default=None)
 
     schedule_parser = subparsers.add_parser("update-schedule")
     schedule_parser.add_argument("activity_id", type=int)
@@ -851,9 +1059,26 @@ def main() -> int:
         if args.command == "list":
             payload = list_target_activities(
                 limit=args.limit,
+                offset=args.offset,
+                sort_by=args.sort_by,
+                state=args.state,
                 name_contains=args.name_contains,
                 activity_type=args.activity_type,
+                starts_after=args.starts_after,
+                starts_before=args.starts_before,
+                modified_after=args.modified_after,
+                ends_after=args.ends_after,
+                ends_before=args.ends_before,
+                workspace=args.workspace,
+                segment_id=args.segment_id,
+                profile_attribute_id=args.profile_attribute_id,
+                priority=args.priority,
+                mbox=args.mbox,
+                offer_id=args.offer_id,
+                view_id=args.view_id,
             )
+        elif args.command == "list-workspaces":
+            payload = list_target_workspaces()
         elif args.command == "get":
             payload = get_activity_bundle(args.activity_id, args.activity_type)
         elif args.command == "get-activity":
@@ -862,6 +1087,12 @@ def main() -> int:
             payload = get_target_offer(args.offer_id)
         elif args.command == "deactivate":
             payload = deactivate_target_activity(args.activity_id)
+        elif args.command == "preview":
+            payload = preview_target_activity(
+                args.activity_id,
+                activity_type=args.activity_type,
+                url=args.url,
+            )
         elif args.command == "create-draft":
             payload = create_draft_activity(json.loads(args.payload_json))
         elif args.command == "list-audiences":
@@ -876,6 +1107,18 @@ def main() -> int:
                 limit=args.limit,
                 offset=args.offset,
                 name=args.name,
+            )
+        elif args.command == "get-mbox":
+            payload = get_target_mbox(args.mbox_name)
+        elif args.command == "list-mbox-profile-attributes":
+            payload = list_target_mbox_profile_attributes(
+                limit=args.limit, offset=args.offset
+            )
+        elif args.command == "list-response-tokens":
+            payload = list_target_response_tokens()
+        elif args.command == "create-response-token":
+            payload = create_target_response_token(
+                args.name, description=args.description
             )
         elif args.command == "update-schedule":
             payload = update_activity_schedule(

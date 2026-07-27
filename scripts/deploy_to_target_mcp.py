@@ -532,6 +532,10 @@ def create_target_activity(
         params["ends_at"] = ends_at
     if description := activity_info.get("activity_description"):
         params["description"] = description
+    # Optional workspace picker — only forward when set locally. Absent means
+    # "use the tenant's default workspace" (Adobe MCP tool default behavior).
+    if workspace_id := str(activity_info.get("workspace_id") or "").strip():
+        params["workspace_id"] = workspace_id
 
     print(f"Creating activity in Adobe Target via {tool_name}...")
     response = client.call_tool(tool_name, params)
@@ -691,6 +695,383 @@ def sync_activity_state(
     return extract_tool_result(response)
 
 
+def get_target_activity_snapshot(
+    client: McpClient, activity_info: dict, type_map: dict
+) -> dict:
+    """Fetch the current Target activity payload once so every sync step can
+    diff against it instead of making its own round trip. Returns `{}` when
+    there's no activity yet (create path) or when the fetch fails — callers
+    treat empty snapshot as "push everything anyway", not "skip".
+    """
+    activity_id = activity_info.get("activity_id")
+    if not activity_id:
+        return {}
+    activity_type = map_activity_type(
+        activity_info.get("activity_type", "XT"), type_map
+    )
+    tool_name = f"get_{activity_type}_activity"
+    try:
+        response = client.call_tool(
+            tool_name, {"activity_id": int(activity_id)}
+        )
+        result = extract_tool_result(response)
+        return result if isinstance(result, dict) else {}
+    except Exception as error:  # noqa: BLE001
+        print(
+            f"WARNING: Could not fetch current Target snapshot for diff: {error}"
+        )
+        return {}
+
+
+def _extract_target_experiences(current: dict) -> list[dict]:
+    """Pull the variant list from a Target activity payload, tolerating the
+    two names the MCP schema has used (`experiences` and `variants`)."""
+    for key in ("experiences", "variants", "options"):
+        entries = current.get(key)
+        if isinstance(entries, list) and entries:
+            return [e for e in entries if isinstance(e, dict)]
+    return []
+
+
+def _local_variant_display_name(variant: dict) -> str:
+    """The name we use both to reference the variant in Target and to match
+    it against Target's `experiences[].name`. Falls back through the same
+    priority order as `build_activity_experiences`."""
+    return (
+        (variant.get("experience_name") or "").strip()
+        or (variant.get("offer_name") or "").strip()
+        or (variant.get("variant") or "").strip()
+    )
+
+
+def sync_activity_name(
+    client: McpClient,
+    activity_info: dict,
+    current: dict,
+    config: dict,
+) -> dict:
+    """Push a rename to Target only when the (prefixed) local name differs.
+
+    Compares AFTER applying the deploy prefix so we don't churn the name on
+    every merge — the deploy always re-adds `[GitHub][user]` and Target
+    already has it. Only surfaces a call to `update_activity_name` when the
+    user actually changed the base name in `activity-info.json`.
+    """
+    activity_id = activity_info.get("activity_id")
+    if not activity_id:
+        return {"skipped": True, "reason": "activity_id missing"}
+
+    prefix = get_name_prefix(config)
+    desired = with_name_prefix(
+        activity_info.get("activity_name", ""), prefix
+    ).strip()
+    if not desired:
+        return {"skipped": True, "reason": "no activity_name"}
+
+    current_name = str(current.get("name") or "").strip()
+    if current_name and current_name == desired:
+        return {"skipped": True, "reason": "name unchanged"}
+
+    print(
+        f"Renaming Target activity {activity_id}: "
+        f"'{current_name or '(unknown)'}' -> '{desired}'"
+    )
+    response = client.call_tool(
+        "update_activity_name",
+        {"activity_id": int(activity_id), "name": desired},
+    )
+    return {
+        "previous": current_name,
+        "next": desired,
+        "result": extract_tool_result(response),
+    }
+
+
+def sync_activity_priority(
+    client: McpClient, activity_info: dict, current: dict
+) -> dict:
+    """Optional. If `activity_priority` (0–999) is set locally AND differs
+    from Target's current priority, push it via `update_activity_priority`.
+    Absence in `activity-info.json` means "leave whatever Target has alone"."""
+    activity_id = activity_info.get("activity_id")
+    if not activity_id:
+        return {"skipped": True, "reason": "activity_id missing"}
+
+    raw = activity_info.get("activity_priority")
+    if raw is None or raw == "":
+        return {"skipped": True, "reason": "priority not set locally"}
+    try:
+        desired = int(raw)
+    except (TypeError, ValueError):
+        return {"skipped": True, "reason": f"invalid priority '{raw}'"}
+    if not 0 <= desired <= 999:
+        return {"skipped": True, "reason": f"priority out of range: {desired}"}
+
+    current_priority: int | None = None
+    try:
+        if current.get("priority") is not None:
+            current_priority = int(current.get("priority"))
+    except (TypeError, ValueError):
+        current_priority = None
+    if current_priority == desired:
+        return {"skipped": True, "reason": "priority unchanged"}
+
+    print(
+        f"Updating Target activity {activity_id} priority: "
+        f"{current_priority} -> {desired}"
+    )
+    response = client.call_tool(
+        "update_activity_priority",
+        {"activity_id": int(activity_id), "priority": desired},
+    )
+    return {
+        "previous": current_priority,
+        "next": desired,
+        "result": extract_tool_result(response),
+    }
+
+
+def sync_activity_description(
+    client: McpClient, activity_info: dict, current: dict
+) -> dict:
+    """Generic-field sync via `update_activity`. Description is the most
+    common field that drifts between GitHub and Target — everything else
+    (name/priority/schedule/state/variants) already has a specialized tool
+    that produces cleaner diffs and audit trails."""
+    activity_id = activity_info.get("activity_id")
+    if not activity_id:
+        return {"skipped": True, "reason": "activity_id missing"}
+
+    desired = str(activity_info.get("activity_description") or "").strip()
+    if not desired:
+        return {"skipped": True, "reason": "no description set locally"}
+    current_desc = str(current.get("description") or "").strip()
+    if current_desc == desired:
+        return {"skipped": True, "reason": "description unchanged"}
+
+    print(f"Updating Target activity {activity_id} description...")
+    response = client.call_tool(
+        "update_activity",
+        {
+            "activity_id": int(activity_id),
+            "activity": {"description": desired},
+        },
+    )
+    return {
+        "previous": current_desc,
+        "next": desired,
+        "result": extract_tool_result(response),
+    }
+
+
+def sync_activity_variants(
+    client: McpClient,
+    activity_info: dict,
+    current: dict,
+    config: dict,
+    actions: dict,
+) -> dict:
+    """Diff local `variants[]` against Target's `experiences[]`.
+
+    * NEW locally, missing in Target      -> `add_activity_variant`
+    * IN Target but missing locally       -> `remove_activity_variant`
+                                             (only when `remove_missing_variants`
+                                             action is true — destructive)
+    * AB / ABT with a valid 100%-summed
+      traffic_percent config              -> `update_traffic_split`
+
+    Runs BEFORE the offer-attach loop so newly-added variants exist by the
+    time `update_variant_offer` tries to point them at an offer.
+    """
+    activity_id = activity_info.get("activity_id")
+    if not activity_id:
+        return {"skipped": True, "reason": "activity_id missing"}
+
+    type_map = config.get("activity_type_map", {})
+    activity_type = map_activity_type(
+        activity_info.get("activity_type", "XT"), type_map
+    )
+    local_variants = activity_info.get("variants") or []
+    target_variants = _extract_target_experiences(current)
+
+    local_names: list[str] = []
+    for variant in local_variants:
+        if not isinstance(variant, dict):
+            continue
+        name = _local_variant_display_name(variant)
+        if name:
+            local_names.append(name)
+
+    target_names = [
+        str(v.get("name") or "").strip() for v in target_variants
+    ]
+
+    result: dict = {
+        "added": [],
+        "removed": [],
+        "traffic_split": None,
+    }
+
+    if actions.get("add_activity_variants", True):
+        for name in local_names:
+            if name in target_names:
+                continue
+            print(
+                f"Adding variant '{name}' to Target activity {activity_id}..."
+            )
+            try:
+                response = client.call_tool(
+                    "add_activity_variant",
+                    {
+                        "activity_id": int(activity_id),
+                        "activity_type": activity_type,
+                        "name": name,
+                    },
+                )
+                result["added"].append(
+                    {"name": name, "result": extract_tool_result(response)}
+                )
+                target_names.append(name)
+            except Exception as error:  # noqa: BLE001
+                result["added"].append({"name": name, "error": str(error)})
+
+    if actions.get("remove_missing_variants", False):
+        # Removing is destructive — only runs when explicitly opted in. Target
+        # activities often have anonymous or auto-created variants we don't
+        # want the deploy to accidentally wipe just because GitHub disagrees.
+        for target_variant in target_variants:
+            name = str(target_variant.get("name") or "").strip()
+            if not name or name in local_names:
+                continue
+            print(
+                f"Removing stale variant '{name}' from Target activity "
+                f"{activity_id}..."
+            )
+            try:
+                response = client.call_tool(
+                    "remove_activity_variant",
+                    {
+                        "activity_id": int(activity_id),
+                        "activity_type": activity_type,
+                        "name": name,
+                    },
+                )
+                result["removed"].append(
+                    {"name": name, "result": extract_tool_result(response)}
+                )
+            except Exception as error:  # noqa: BLE001
+                result["removed"].append({"name": name, "error": str(error)})
+
+    if activity_type in {"ab", "abt"} and local_variants:
+        splits: dict[str, int] = {}
+        for variant in local_variants:
+            if not isinstance(variant, dict):
+                continue
+            name = _local_variant_display_name(variant)
+            if not name:
+                continue
+            try:
+                splits[name] = int(variant.get("traffic_percent") or 0)
+            except (TypeError, ValueError):
+                splits[name] = 0
+
+        total = sum(splits.values())
+        if not splits:
+            result["traffic_split"] = {
+                "skipped": True,
+                "reason": "no traffic_percent set on local variants",
+            }
+        elif total != 100:
+            # Refuse to push an invalid split — Target would reject it too and
+            # the error is friendlier surfaced here.
+            result["traffic_split"] = {
+                "skipped": True,
+                "reason": (
+                    f"local traffic_percent values sum to {total}, must be 100"
+                ),
+            }
+        else:
+            current_splits: dict[str, int] = {}
+            for entry in target_variants:
+                name = str(entry.get("name") or "").strip()
+                if not name:
+                    continue
+                try:
+                    current_splits[name] = int(
+                        entry.get("visitorPercentage")
+                        or entry.get("traffic_percent")
+                        or 0
+                    )
+                except (TypeError, ValueError):
+                    current_splits[name] = 0
+            if current_splits == splits:
+                result["traffic_split"] = {
+                    "skipped": True,
+                    "reason": "traffic split unchanged",
+                }
+            else:
+                print(
+                    f"Updating traffic split for Target activity "
+                    f"{activity_id}: {splits}"
+                )
+                try:
+                    response = client.call_tool(
+                        "update_traffic_split",
+                        {
+                            "activity_id": int(activity_id),
+                            "activity_type": activity_type,
+                            "splits": splits,
+                        },
+                    )
+                    result["traffic_split"] = {
+                        "previous": current_splits,
+                        "next": splits,
+                        "result": extract_tool_result(response),
+                    }
+                except Exception as error:  # noqa: BLE001
+                    result["traffic_split"] = {"error": str(error)}
+
+    return result
+
+
+def sync_activity_schedule(client: McpClient, activity_info: dict) -> dict:
+    """Push activity_start_date / activity_end_date from activity-info.json
+    to Target via the `update_activity_schedule` MCP tool.
+
+    Only runs when the activity already exists in Target (`activity_id > 0`).
+    On the *initial* create path we already pass starts_at / ends_at inline to
+    `create_*_activity`, so this function is primarily what makes schedule
+    edits from the "Goals & schedule" panel actually land in Target on merge.
+
+    Returns `{skipped: True, reason}` when there's nothing to do, so the
+    deploy summary can distinguish "we tried and failed" from "there was
+    nothing scheduled".
+    """
+    activity_id = activity_info.get("activity_id")
+    if not activity_id:
+        return {"skipped": True, "reason": "activity_id missing"}
+
+    starts_at = (activity_info.get("activity_start_date") or "").strip()
+    ends_at = (activity_info.get("activity_end_date") or "").strip()
+    if not starts_at and not ends_at:
+        # Both blank means "no schedule" — don't push empty strings, MCP would
+        # either reject them or, worse, clear an existing schedule silently.
+        return {"skipped": True, "reason": "no schedule dates set"}
+
+    params: dict = {"activity_id": int(activity_id)}
+    if starts_at:
+        params["starts_at"] = starts_at
+    if ends_at:
+        params["ends_at"] = ends_at
+
+    print(
+        f"Syncing activity {activity_id} schedule "
+        f"(starts_at={starts_at or '-'}, ends_at={ends_at or '-'})..."
+    )
+    response = client.call_tool("update_activity_schedule", params)
+    return extract_tool_result(response)
+
+
 def validate_update_requirements(
     activity_info: dict, offers: list[dict], folder: Path
 ) -> None:
@@ -729,6 +1110,14 @@ def deploy_activity_folder(
         "activity_update_result": None,
         "offers": [],
         "activity_state": None,
+        # Diff-based sync outcomes. All start as None and get populated with
+        # `{skipped: True, reason}` or an actual result when the corresponding
+        # action runs. Deploy summary reads these to print per-step status.
+        "activity_name_sync": None,
+        "activity_priority_sync": None,
+        "activity_description_sync": None,
+        "activity_variants_sync": None,
+        "activity_schedule": None,
     }
 
     print(f"\nDeploying activity folder ({deploy_mode}): {results['folder']}")
@@ -771,6 +1160,48 @@ def deploy_activity_folder(
             "activity_id": activity_info.get("activity_id"),
             "message": "Existing activity reused for offer update",
         }
+
+    # ---------------------------------------------------------------------
+    # Intelligent metadata + variants sync (only when an activity exists).
+    #
+    # Fetch Target's current state ONCE and thread it through every diff-
+    # based helper below so each one can skip when its field is unchanged —
+    # avoids gratuitous MCP calls and makes deploy summaries actionable
+    # ("what actually changed this merge?").
+    #
+    # Order matters:
+    #   1. Metadata (name/priority/description) — pure updates on the
+    #      activity envelope, safe in any order relative to each other.
+    #   2. Variants (add/remove) — must happen BEFORE the offer-attach loop
+    #      below so that `update_variant_offer` finds the variants it needs
+    #      to attach offers to.
+    #   3. Traffic split — handled inside `sync_activity_variants` and only
+    #      runs after adds/removes so percentages are calculated against the
+    #      final variant set.
+    #   4. State + schedule — run AFTER offers are attached (further down)
+    #      so we never activate an activity that's still missing offer bindings.
+    # ---------------------------------------------------------------------
+    if activity_info.get("activity_id"):
+        current_snapshot = get_target_activity_snapshot(
+            client, activity_info, config.get("activity_type_map", {})
+        )
+
+        if actions.get("sync_activity_name", True):
+            results["activity_name_sync"] = sync_activity_name(
+                client, activity_info, current_snapshot, config
+            )
+        if actions.get("sync_activity_priority", True):
+            results["activity_priority_sync"] = sync_activity_priority(
+                client, activity_info, current_snapshot
+            )
+        if actions.get("sync_activity_description", True):
+            results["activity_description_sync"] = sync_activity_description(
+                client, activity_info, current_snapshot
+            )
+        if actions.get("sync_activity_variants", True):
+            results["activity_variants_sync"] = sync_activity_variants(
+                client, activity_info, current_snapshot, config, actions
+            )
 
     if not offers:
         print("No offers found to deploy.")
@@ -819,6 +1250,18 @@ def deploy_activity_folder(
             config.get("status_map", {}),
         )
 
+    # Push schedule changes (start/end dates from Goals & schedule) to Target
+    # AFTER create-or-update settled the activity_id. Safe to run in both
+    # create and update modes: create already includes the initial dates
+    # inline, but re-sending them here is idempotent and lets edits made in
+    # ATGitOps land in Target on the next merge without a separate manual step.
+    if actions.get("sync_activity_schedule", True) and activity_info.get(
+        "activity_id"
+    ):
+        results["activity_schedule"] = sync_activity_schedule(
+            client, activity_info
+        )
+
     return results
 
 
@@ -853,20 +1296,72 @@ def print_deploy_summary(all_results: list[dict]) -> None:
         offers = result.get("offers", [])
         if not offers:
             print("  - No offers deployed.")
-            continue
+        else:
+            for offer in offers:
+                offer_result = offer.get("offer_result") or {}
+                offer_id = offer_result.get("id")
+                html_file = offer.get("html_file", "unknown")
+                if offer_id:
+                    action = "updated" if deploy_mode == "update" else "deployed"
+                    print(
+                        f"  - Offer {action} from '{html_file}' "
+                        f"in Adobe Target (id={offer_id})"
+                    )
+                else:
+                    print(f"  - Offer processed from '{html_file}'.")
 
-        for offer in offers:
-            offer_result = offer.get("offer_result") or {}
-            offer_id = offer_result.get("id")
-            html_file = offer.get("html_file", "unknown")
-            if offer_id:
-                action = "updated" if deploy_mode == "update" else "deployed"
-                print(
-                    f"  - Offer {action} from '{html_file}' "
-                    f"in Adobe Target (id={offer_id})"
-                )
-            else:
-                print(f"  - Offer processed from '{html_file}'.")
+        # Report each intelligent sync step. A `None` value means the action
+        # wasn't enabled; `{skipped: True}` means it ran but decided nothing
+        # needed pushing; anything else is a real MCP call.
+        name_sync = result.get("activity_name_sync")
+        if isinstance(name_sync, dict) and not name_sync.get("skipped"):
+            previous = name_sync.get("previous") or "(unknown)"
+            nxt = name_sync.get("next") or "(unknown)"
+            print(f"  - Activity renamed in Adobe Target: '{previous}' -> '{nxt}'")
+
+        priority_sync = result.get("activity_priority_sync")
+        if isinstance(priority_sync, dict) and not priority_sync.get("skipped"):
+            print(
+                f"  - Activity priority set to {priority_sync.get('next')} "
+                f"(was {priority_sync.get('previous')})."
+            )
+
+        desc_sync = result.get("activity_description_sync")
+        if isinstance(desc_sync, dict) and not desc_sync.get("skipped"):
+            print("  - Activity description updated in Adobe Target.")
+
+        variants_sync = result.get("activity_variants_sync")
+        if isinstance(variants_sync, dict) and not variants_sync.get("skipped"):
+            added = variants_sync.get("added") or []
+            removed = variants_sync.get("removed") or []
+            for entry in added:
+                if entry.get("error"):
+                    print(
+                        f"  - WARN: Could not add variant '{entry.get('name')}': "
+                        f"{entry.get('error')}"
+                    )
+                else:
+                    print(f"  - Variant added: '{entry.get('name')}'")
+            for entry in removed:
+                if entry.get("error"):
+                    print(
+                        f"  - WARN: Could not remove variant '{entry.get('name')}': "
+                        f"{entry.get('error')}"
+                    )
+                else:
+                    print(f"  - Variant removed: '{entry.get('name')}'")
+            traffic = variants_sync.get("traffic_split")
+            if isinstance(traffic, dict) and not traffic.get("skipped"):
+                if traffic.get("error"):
+                    print(
+                        f"  - WARN: Traffic split update failed: {traffic.get('error')}"
+                    )
+                else:
+                    print(f"  - Traffic split updated to {traffic.get('next')}.")
+
+        schedule = result.get("activity_schedule")
+        if isinstance(schedule, dict) and not schedule.get("skipped"):
+            print("  - Activity schedule synced to Adobe Target.")
 
     print("\nDeployment to Adobe Target MCP completed successfully.")
 

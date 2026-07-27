@@ -25,6 +25,13 @@
     "push_offer": true,
     "attach_offer_to_variant": true,
     "sync_activity_state": false,
+    "sync_activity_schedule": true,
+    "sync_activity_name": true,
+    "sync_activity_priority": true,
+    "sync_activity_description": true,
+    "sync_activity_variants": true,
+    "add_activity_variants": true,
+    "remove_missing_variants": false,
     "create_activity_if_missing": true
   },
   "deploy_name_prefix": "[GitHub]",
