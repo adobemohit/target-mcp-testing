@@ -1,0 +1,258 @@
+<style data-atgit-offer="css">
+/* Horizon welcome nudge — uses live :root tokens */
+[data-atgit-offer-host] {
+  box-sizing: border-box;
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 60;
+  max-width: min(22.5rem, calc(100vw - 2.5rem));
+  pointer-events: none;
+}
+
+[data-atgit-offer-host] *,
+[data-atgit-offer-host] *::before,
+[data-atgit-offer-host] *::after {
+  box-sizing: border-box;
+}
+
+[data-atgit-offer-host] .at-welcome-nudge {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1rem 1.05rem 1rem 1.1rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.97);
+  color: var(--ink, #0e2136);
+  border: 1px solid var(--line, rgba(14, 33, 54, 0.1));
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.7) inset,
+    var(--shadow, 0 14px 34px rgba(14, 33, 54, 0.1));
+  font-family: var(--font-body, "Figtree", sans-serif);
+  line-height: 1.45;
+  transform: translateY(12px);
+  opacity: 0;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+}
+
+[data-atgit-offer-host] .at-welcome-nudge::before {
+  content: "";
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  top: 0;
+  height: 3px;
+  border-radius: 0 0 4px 4px;
+  background: linear-gradient(90deg, var(--sky-deep, #2a78ab), var(--sky, #6eb6e0), var(--sand, #c9925a));
+}
+
+[data-atgit-offer-host] .at-welcome-nudge.is-visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+[data-atgit-offer-host] .at-welcome-nudge.is-leaving {
+  transform: translateY(10px);
+  opacity: 0;
+}
+
+[data-atgit-offer-host] .at-welcome-mark {
+  flex: 0 0 auto;
+  width: 1.3rem;
+  height: 1.3rem;
+  margin-top: 0.15rem;
+  border-radius: 50% 50% 45% 55%;
+  background: linear-gradient(145deg, var(--sky, #6eb6e0) 0%, var(--sky-deep, #2a78ab) 55%, var(--sand, #c9925a) 120%);
+  box-shadow: inset 0 -6px 12px rgba(16, 35, 58, 0.15);
+}
+
+[data-atgit-offer-host] .at-welcome-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+[data-atgit-offer-host] .at-welcome-title {
+  margin: 0 0 0.2rem;
+  font-family: var(--font-display, "Syne", sans-serif);
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--ink, #0e2136);
+}
+
+[data-atgit-offer-host] .at-welcome-copy {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--ink-soft, #4a6278);
+}
+
+[data-atgit-offer-host] .at-welcome-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+
+[data-atgit-offer-host] .at-welcome-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 10px;
+  padding: 0.45rem 0.9rem;
+  font-family: var(--font-body, "Figtree", sans-serif);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--white, #ffffff);
+  background: linear-gradient(135deg, var(--sky-deep, #2a78ab), #1f5f8a);
+  box-shadow: 0 6px 16px rgba(42, 120, 171, 0.22);
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+[data-atgit-offer-host] .at-welcome-cta:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  color: var(--white, #ffffff);
+}
+
+[data-atgit-offer-host] .at-welcome-dismiss {
+  border: 0;
+  background: transparent;
+  padding: 0.35rem 0.15rem;
+  font-family: var(--font-body, "Figtree", sans-serif);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink-soft, #4a6278);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+}
+
+[data-atgit-offer-host] .at-welcome-dismiss:hover {
+  color: var(--ink, #0e2136);
+}
+
+[data-atgit-offer-host] .at-welcome-close {
+  flex: 0 0 auto;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin: -0.2rem -0.25rem 0 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink-soft, #4a6278);
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+[data-atgit-offer-host] .at-welcome-close:hover {
+  background: var(--mist, #d7ebf6);
+  color: var(--ink, #0e2136);
+}
+
+@media (max-width: 560px) {
+  [data-atgit-offer-host] {
+    right: 0.75rem;
+    left: 0.75rem;
+    bottom: 0.75rem;
+    max-width: none;
+  }
+}
+</style>
+
+<script data-atgit-offer="js">
+(function () {
+  var ATTR = "data-atgit-offer-host";
+  var prev = document.querySelectorAll("[" + ATTR + "]");
+  for (var i = 0; i < prev.length; i++) prev[i].remove();
+
+  var host = document.createElement("div");
+  host.setAttribute(ATTR, "1");
+  host.setAttribute("role", "status");
+  host.setAttribute("aria-live", "polite");
+
+  var nudge = document.createElement("div");
+  nudge.className = "at-welcome-nudge";
+  nudge.setAttribute("role", "dialog");
+  nudge.setAttribute("aria-label", "Welcome to Horizon");
+
+  var mark = document.createElement("span");
+  mark.className = "at-welcome-mark";
+  mark.setAttribute("aria-hidden", "true");
+
+  var body = document.createElement("div");
+  body.className = "at-welcome-body";
+
+  var title = document.createElement("p");
+  title.className = "at-welcome-title";
+  title.textContent = "Welcome aboard";
+
+  var copy = document.createElement("p");
+  copy.className = "at-welcome-copy";
+  copy.textContent =
+    "Compare fares across 500+ airlines and book with clarity—no guesswork, just open sky.";
+
+  var actions = document.createElement("div");
+  actions.className = "at-welcome-actions";
+
+  var cta = document.createElement("a");
+  cta.className = "at-welcome-cta";
+  cta.href = "#search";
+  cta.textContent = "Search flights";
+
+  var dismiss = document.createElement("button");
+  dismiss.type = "button";
+  dismiss.className = "at-welcome-dismiss";
+  dismiss.textContent = "Maybe later";
+
+  actions.appendChild(cta);
+  actions.appendChild(dismiss);
+  body.appendChild(title);
+  body.appendChild(copy);
+  body.appendChild(actions);
+
+  var close = document.createElement("button");
+  close.type = "button";
+  close.className = "at-welcome-close";
+  close.setAttribute("aria-label", "Dismiss welcome message");
+  close.textContent = "×";
+
+  nudge.appendChild(mark);
+  nudge.appendChild(body);
+  nudge.appendChild(close);
+  host.appendChild(nudge);
+
+  function leave() {
+    if (!host.isConnected) return;
+    nudge.classList.remove("is-visible");
+    nudge.classList.add("is-leaving");
+    window.setTimeout(function () {
+      if (host.parentNode) host.parentNode.removeChild(host);
+    }, 320);
+  }
+
+  close.addEventListener("click", leave);
+  dismiss.addEventListener("click", leave);
+  cta.addEventListener("click", function () {
+    leave();
+  });
+
+  var mount = document.body;
+  if (!mount) return;
+  mount.appendChild(host);
+
+  window.requestAnimationFrame(function () {
+    window.requestAnimationFrame(function () {
+      if (host.isConnected) nudge.classList.add("is-visible");
+    });
+  });
+})();
+</script>
