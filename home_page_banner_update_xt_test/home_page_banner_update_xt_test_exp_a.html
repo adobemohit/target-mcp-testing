@@ -1,0 +1,218 @@
+<style data-atgit-offer="css">
+[data-atgit-offer-host] {
+  box-sizing: border-box;
+}
+
+[data-atgit-offer-host].atgit-welcome-nudge {
+  position: fixed;
+  left: 24px;
+  bottom: 24px;
+  z-index: 9999;
+  max-width: 320px;
+  width: calc(100vw - 48px);
+  padding: 20px 22px 18px;
+  background: rgb(242, 247, 251);
+  color: rgb(14, 33, 54);
+  border: 1px solid rgba(14, 33, 54, 0.18);
+  border-radius: 0;
+  box-shadow: 0 12px 32px rgba(10, 24, 40, 0.18);
+  font-family: Figtree, sans-serif;
+  animation: atgit-nudge-in 0.35s ease-out;
+}
+
+[data-atgit-offer-host].atgit-welcome-nudge *,
+[data-atgit-offer-host].atgit-welcome-nudge *::before,
+[data-atgit-offer-host].atgit-welcome-nudge *::after {
+  box-sizing: border-box;
+}
+
+[data-atgit-offer-host] .atgit-nudge-eyebrow {
+  margin: 0 0 6px;
+  font-family: Figtree, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(14, 33, 54, 0.72);
+}
+
+[data-atgit-offer-host] .atgit-nudge-title {
+  margin: 0 0 8px;
+  font-family: Figtree, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: rgb(14, 33, 54);
+}
+
+[data-atgit-offer-host] .atgit-nudge-copy {
+  margin: 0 0 16px;
+  font-family: Figtree, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(14, 33, 54, 0.86);
+}
+
+[data-atgit-offer-host] .atgit-nudge-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+[data-atgit-offer-host] .atgit-nudge-cta {
+  display: inline-block;
+  padding: 10px 16px;
+  background: rgb(14, 33, 54);
+  color: rgb(242, 247, 251);
+  border: 1px solid rgb(14, 33, 54);
+  border-radius: 0;
+  font-family: Figtree, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+[data-atgit-offer-host] .atgit-nudge-cta:hover,
+[data-atgit-offer-host] .atgit-nudge-cta:focus {
+  background: rgb(10, 24, 40);
+  border-color: rgb(10, 24, 40);
+  color: rgb(242, 247, 251);
+  outline: none;
+}
+
+[data-atgit-offer-host] .atgit-nudge-dismiss {
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 8px 4px;
+  font-family: Figtree, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(14, 33, 54, 0.72);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+[data-atgit-offer-host] .atgit-nudge-dismiss:hover,
+[data-atgit-offer-host] .atgit-nudge-dismiss:focus {
+  color: rgb(14, 33, 54);
+  outline: none;
+}
+
+[data-atgit-offer-host] .atgit-nudge-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: rgb(14, 33, 54);
+  font-family: Figtree, sans-serif;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+[data-atgit-offer-host] .atgit-nudge-close:hover,
+[data-atgit-offer-host] .atgit-nudge-close:focus {
+  color: rgb(10, 24, 40);
+  outline: none;
+}
+
+@keyframes atgit-nudge-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 480px) {
+  [data-atgit-offer-host].atgit-welcome-nudge {
+    left: 16px;
+    bottom: 16px;
+    max-width: none;
+    width: calc(100vw - 32px);
+    padding: 18px 18px 16px;
+  }
+}
+</style>
+
+<script data-atgit-offer="js">
+(function () {
+  var nodes = document.querySelectorAll("[data-atgit-offer-host]");
+  for (var i = 0; i < nodes.length; i++) {
+    nodes[i].remove();
+  }
+
+  var host = document.createElement("div");
+  host.setAttribute("data-atgit-offer-host", "1");
+  host.className = "atgit-welcome-nudge";
+  host.setAttribute("role", "dialog");
+  host.setAttribute("aria-label", "Welcome to Horizon");
+
+  var close = document.createElement("button");
+  close.type = "button";
+  close.className = "atgit-nudge-close";
+  close.setAttribute("aria-label", "Dismiss welcome message");
+  close.textContent = "×";
+
+  var eyebrow = document.createElement("p");
+  eyebrow.className = "atgit-nudge-eyebrow";
+  eyebrow.textContent = "Horizon";
+
+  var title = document.createElement("h2");
+  title.className = "atgit-nudge-title";
+  title.textContent = "Welcome aboard";
+
+  var copy = document.createElement("p");
+  copy.className = "atgit-nudge-copy";
+  copy.textContent =
+    "Compare fares across 500+ airlines and book with clarity—transparent prices, live inventory, open sky.";
+
+  var actions = document.createElement("div");
+  actions.className = "atgit-nudge-actions";
+
+  var cta = document.createElement("a");
+  cta.className = "atgit-nudge-cta";
+  cta.href = "#search";
+  cta.textContent = "Book a flight";
+
+  var dismiss = document.createElement("button");
+  dismiss.type = "button";
+  dismiss.className = "atgit-nudge-dismiss";
+  dismiss.textContent = "Maybe later";
+
+  function hideNudge() {
+    if (host && host.parentNode) {
+      host.remove();
+    }
+  }
+
+  close.addEventListener("click", hideNudge);
+  dismiss.addEventListener("click", hideNudge);
+  cta.addEventListener("click", function () {
+    hideNudge();
+  });
+
+  actions.appendChild(cta);
+  actions.appendChild(dismiss);
+
+  host.appendChild(close);
+  host.appendChild(eyebrow);
+  host.appendChild(title);
+  host.appendChild(copy);
+  host.appendChild(actions);
+
+  document.body.appendChild(host);
+})();
+</script>
