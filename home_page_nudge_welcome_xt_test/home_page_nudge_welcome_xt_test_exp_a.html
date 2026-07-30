@@ -1,0 +1,205 @@
+<style data-atgit-offer="css">
+/* Horizon welcome nudge — site fonts & palette only */
+[data-atgit-offer-host] {
+  box-sizing: border-box;
+}
+
+[data-atgit-offer-host],
+[data-atgit-offer-host] * {
+  box-sizing: border-box;
+}
+
+[data-atgit-offer-host] {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 9999;
+  width: min(360px, calc(100vw - 32px));
+  background: rgb(242, 247, 251);
+  color: rgb(14, 33, 54);
+  border: 1px solid rgb(14, 33, 54);
+  font-family: Figtree, sans-serif;
+  padding: 20px 20px 18px;
+  box-shadow: 0 8px 28px rgba(14, 33, 54, 0.16);
+}
+
+[data-atgit-offer-host][data-atgit-hidden="1"] {
+  display: none;
+}
+
+[data-atgit-offer-host] .atgit-nudge-eyebrow {
+  margin: 0 0 6px;
+  font-family: Figtree, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(14, 33, 54);
+  opacity: 0.72;
+}
+
+[data-atgit-offer-host] .atgit-nudge-title {
+  margin: 0 0 10px;
+  font-family: Figtree, sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: rgb(14, 33, 54);
+}
+
+[data-atgit-offer-host] .atgit-nudge-copy {
+  margin: 0 0 16px;
+  font-family: Figtree, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  color: rgb(14, 33, 54);
+  opacity: 0.92;
+}
+
+[data-atgit-offer-host] .atgit-nudge-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+[data-atgit-offer-host] .atgit-nudge-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 11px 18px;
+  border: 1px solid rgb(14, 33, 54);
+  border-radius: 0;
+  background: rgb(14, 33, 54);
+  color: rgb(242, 247, 251);
+  font-family: Figtree, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+[data-atgit-offer-host] .atgit-nudge-cta:hover,
+[data-atgit-offer-host] .atgit-nudge-cta:focus {
+  background: rgb(10, 24, 40);
+  border-color: rgb(10, 24, 40);
+  color: rgb(242, 247, 251);
+  outline: none;
+}
+
+[data-atgit-offer-host] .atgit-nudge-dismiss {
+  margin: 0;
+  padding: 8px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: rgb(14, 33, 54);
+  font-family: Figtree, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+[data-atgit-offer-host] .atgit-nudge-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: rgb(14, 33, 54);
+  font-family: Figtree, sans-serif;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@media (max-width: 520px) {
+  [data-atgit-offer-host] {
+    right: 16px;
+    bottom: 16px;
+    width: calc(100vw - 32px);
+    padding: 18px 16px 16px;
+  }
+}
+</style>
+
+<script data-atgit-offer="js">
+(function () {
+  document.querySelectorAll("[data-atgit-offer-host]").forEach(function (node) {
+    node.remove();
+  });
+
+  var host = document.createElement("aside");
+  host.setAttribute("data-atgit-offer-host", "1");
+  host.setAttribute("role", "dialog");
+  host.setAttribute("aria-labelledby", "atgit-nudge-title");
+  host.setAttribute("aria-describedby", "atgit-nudge-copy");
+
+  var closeBtn = document.createElement("button");
+  closeBtn.type = "button";
+  closeBtn.className = "atgit-nudge-close";
+  closeBtn.setAttribute("aria-label", "Dismiss welcome message");
+  closeBtn.textContent = "×";
+
+  var eyebrow = document.createElement("p");
+  eyebrow.className = "atgit-nudge-eyebrow";
+  eyebrow.textContent = "Welcome to Horizon";
+
+  var title = document.createElement("h2");
+  title.className = "atgit-nudge-title";
+  title.id = "atgit-nudge-title";
+  title.textContent = "Your next flight starts here";
+
+  var copy = document.createElement("p");
+  copy.className = "atgit-nudge-copy";
+  copy.id = "atgit-nudge-copy";
+  copy.textContent =
+    "Compare live fares across 500+ airlines, lock in transparent totals, and book in minutes. New travelers often save around $84 versus booking airline-direct—start with your route below.";
+
+  var actions = document.createElement("div");
+  actions.className = "atgit-nudge-actions";
+
+  var cta = document.createElement("a");
+  cta.className = "atgit-nudge-cta";
+  cta.href = "#search";
+  cta.textContent = "Book now";
+
+  var dismiss = document.createElement("button");
+  dismiss.type = "button";
+  dismiss.className = "atgit-nudge-dismiss";
+  dismiss.textContent = "Not now";
+
+  function hideNudge() {
+    host.setAttribute("data-atgit-hidden", "1");
+    host.remove();
+  }
+
+  closeBtn.addEventListener("click", hideNudge);
+  dismiss.addEventListener("click", hideNudge);
+  cta.addEventListener("click", function () {
+    var search = document.querySelector("#search") || document.querySelector("#flight-search");
+    if (search && typeof search.scrollIntoView === "function") {
+      search.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  });
+
+  actions.appendChild(cta);
+  actions.appendChild(dismiss);
+
+  host.appendChild(closeBtn);
+  host.appendChild(eyebrow);
+  host.appendChild(title);
+  host.appendChild(copy);
+  host.appendChild(actions);
+
+  document.body.appendChild(host);
+})();
+</script>
